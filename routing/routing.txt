@@ -1,0 +1,83 @@
+﻿# =====================================================
+# M&B Reviews Web Application - Routing & Middleware
+# =====================================================
+
+
+# Middleware Documentation
+
+
+# loadBooksMW: Loads all books from the database.
+# Used for listing books on the homepage.
+MIDDLEWARE loadBooksMW
+
+# loadMoviesMW: Loads all movies from the database.
+# Used for listing movies on the homepage.
+MIDDLEWARE loadMoviesMW
+
+# loadItemMW: Loads a single book or movie from the database.
+# If the item is found, it passes data to the next middleware.
+MIDDLEWARE loadItemMW
+
+# saveItemMW: Saves a new book or movie to the database.
+# Only accessible by authenticated users.
+MIDDLEWARE saveItemMW
+
+# deleteItemMW: Deletes a book or movie from the database.
+# Redirects the user to the homepage after deletion.
+MIDDLEWARE deleteItemMW
+
+# renderMW: Renders an HTML page using the appropriate template.
+MIDDLEWARE renderMW
+
+# authMW: Checks if the user is authenticated.
+# If the user is not logged in, redirects to /login.
+MIDDLEWARE authMW
+
+# logoutMW: Logs out the user by destroying the session.
+MIDDLEWARE logoutMW
+
+# loginMW: Handles user login by verifying credentials.
+MIDDLEWARE loginMW
+
+# saveReviewMW: Saves a comment of an item from a user to the database.
+MIDDLEWARE saveReviewMW
+
+
+# Routing Configuration
+
+
+# Home Page - Lists all movies
+GET     /                 loadMoviesMW  renderMW(index.html)
+
+# Movies page - Lists all movies
+GET     /movies           loadMoviesMW  renderMW(index.html)
+
+# Books page - Lists all books
+GET     /books            loadBooksMW  renderMW(index.html)
+
+# Login Page - Displays login form
+GET     /login            renderMW(login.html)
+
+# Login Submission - Processes login request
+POST    /login            loginMW
+
+# Logout - Ends user session
+GET     /logout           logoutMW
+
+# View Item Details
+GET     /details/:id      loadItemMW renderMW(details.html)
+
+# Add a New Item (Requires Authentication)
+GET     /add              authMW renderMW(add.html)
+POST    /add              authMW saveItemMW
+
+# Edit an Existing Item (Requires Authentication)
+GET     /edit/:id         authMW loadItemMW renderMW(edit.html)
+POST    /edit/:id         authMW loadItemMW saveItemMW
+
+# Delete an Item (Requires Authentication)
+DELETE  /delete/:id       authMW deleteItemMW
+
+# Review Submission
+POST    /reviews/:id  authMW saveReviewMW
+
