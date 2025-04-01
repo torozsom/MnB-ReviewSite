@@ -15,15 +15,14 @@ const saveReviewMW = require('../middlewares/saveReview');
 const objRepo = {};
 
 function subscribeToRoutes(app) {
-    app.get('/', loadMoviesMW(objRepo), renderMW(objRepo));
-    app.get('/movies', loadMoviesMW(objRepo), renderMW(objRepo));
-    app.get('/books', loadBooksMW(objRepo), renderMW(objRepo));
-    app.get('/login', renderMW(objRepo));
-    app.get('/register', renderMW(objRepo));
-    app.get('/add', authMW(objRepo), renderMW(objRepo));
-    app.get('/details/:id', loadItemMW(objRepo), renderMW(objRepo));
-    app.get('/add', authMW(objRepo), renderMW(objRepo));
-    app.get('/edit/:id', authMW(objRepo), loadItemMW(objRepo), renderMW(objRepo));
+    app.get('/', loadMoviesMW(objRepo), renderMW(objRepo, 'index', 'Home Page', '/styles.css', true));
+    app.get('/movies', loadMoviesMW(objRepo), renderMW(objRepo, 'index', 'Home Page', '/styles.css', true));
+    app.get('/books', loadBooksMW(objRepo), renderMW(objRepo, 'index', 'Home Page', '/styles.css', true));
+    app.get('/register', renderMW(objRepo, 'register', 'Register', '/auth.css', false));
+    app.get('/login', renderMW(objRepo, 'login', 'Login', '/auth.css', false));
+    app.get('/add', authMW(objRepo), renderMW(objRepo, 'add', 'Add Item', '/add.css', false));
+    app.get('/details/:id', loadItemMW(objRepo), renderMW(objRepo, 'details', 'Details', '/details.css', false));
+    app.get('/edit/:id', authMW(objRepo), loadItemMW(objRepo), renderMW(objRepo, 'edit', 'Edit Item', '/edit.css', false));
 }
 
 module.exports = subscribeToRoutes;

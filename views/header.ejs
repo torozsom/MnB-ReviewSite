@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - M&B Reviews</title>
+    <link rel="stylesheet" href="<%= stylesheet %>">
+</head>
+<body>
+<header>
+    <h1>M&B Reviews</h1>
+
+    <% if (showNav) { %>
+        <nav>
+            <a href="#">Movies</a>
+            <a href="#">Books</a>
+            <a href="/add">Add Item</a>
+            <input type="text" placeholder="Search..." class="search-bar">
+            <button class="search-button">🔍</button>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </nav>
+    <% } %>
+</header>

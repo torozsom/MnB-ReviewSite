@@ -2,43 +2,12 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+app.set("view engine", "ejs");
+app.use(express.static('public'));
+app.set('views', path.join(__dirname, 'views'));
 
 const subscribeToRoutes = require('./routing/routing');
 subscribeToRoutes(app);
-
-
-app.use(express.static('public'));
-
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-
-app.get('/details', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'details.html'));
-});
-
-
-app.get('/add', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'add.html'));
-});
-
-
-app.get('/edit', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'edit.html'));
-})
-
-
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'login.html'));
-});
-
-
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'register.html'));
-});
-
 
 
 app.listen(3000, () => {
