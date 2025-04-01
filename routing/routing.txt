@@ -61,6 +61,12 @@ GET     /login            renderMW(login.html)
 # Login Submission - Processes login request
 POST    /login            loginMW
 
+# Register Page - Displays registration form
+GET     /register         renderMW(register.html)
+
+# Register Submission - Processes registration request
+POST    /register         registerMW
+
 # Logout - Ends user session
 GET     /logout           logoutMW
 

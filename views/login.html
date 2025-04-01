@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - M&B Reviews</title>
+    <link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+<header>
+    <h1>M&B Reviews</h1>
+</header>
+
+<main class="form-container">
+    <h2>Login</h2>
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <div class="button-group">
+            <button type="submit" class="green-btn">Login</button>
+            <a href="/" class="red-btn">Cancel</a>
+        </div>
+    </form>
+    <p class="alt-link">Don't have an account? <a href="/register">Register here</a></p>
+</main>
+</body>
+</html>

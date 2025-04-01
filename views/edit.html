@@ -15,11 +15,6 @@
     <h2>Editing Item</h2>
 
     <form action="#" method="POST" enctype="multipart/form-data">
-        <div class="type-selection">
-            <label><input type="radio" name="itemType" value="book" checked> Book</label>
-            <label><input type="radio" name="itemType" value="movie"> Movie</label>
-        </div>
-
         <label class="upload-label">
             Change Cover Picture
             <input type="file" name="cover" accept="image/*">
@@ -35,7 +30,7 @@
         <textarea name="description" rows="4" required>The final book in the Hunger Games trilogy.</textarea>
 
         <div class="button-group">
-            <button type="button"><a href="/">Cancel</a></button>
+            <button type="button" class="cancel-btn"><a href="/">Cancel</a></button>
             <button type="submit" class="update-btn">Update</button>
         </div>
     </form>
