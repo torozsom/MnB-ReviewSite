@@ -1,5 +1,5 @@
-﻿/**
- * Saves a new book or movie to the database.
+/**
+ * Saves a new movie to the database.
  * @param objRepo
  * @returns {function(*, *, *): *}
  */
