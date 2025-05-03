@@ -3,10 +3,10 @@
 <main class="add-container">
     <h2>Adding a New Item</h2>
 
-    <form action="#" method="POST" enctype="multipart/form-data">
+    <form action="/add" method="POST">
 
         <div class="type-selection">
-            <label><input type="radio" name="itemType" value="book"> Book</label>
+            <label><input type="radio" name="itemType" value="book" checked> Book</label>
             <label><input type="radio" name="itemType" value="movie"> Movie</label>
         </div>
 
@@ -16,15 +16,15 @@
 
         <input type="text" name="title" placeholder="Title" required>
 
-        <input type="text" name="producer" placeholder="Producer / Author" required>
+        <input type="text" name="creator" placeholder="Producer / Author" required>
 
-        <input type="number" name="year" placeholder="Release Year" min="1800" max="2099" required>
+        <input type="number" name="year" placeholder="Release Year" required>
 
         <textarea name="description" placeholder="Description" rows="4" required></textarea>
 
         <div class="button-group">
-            <button type="reset" class="cancel-btn"><a href="/">Cancel</a></button>
-            <button type="submit" class="save-btn"><a href="/">Save</a></button>
+            <a href="/" class="cancel-btn">Cancel</a>
+            <button type="submit" class="save-btn">Save</button>
         </div>
     </form>
 </main>

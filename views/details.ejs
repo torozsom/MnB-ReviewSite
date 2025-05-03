@@ -2,32 +2,47 @@
 
 <main class="details-container">
     <div class="image-section">
-        <img src="/hungergames_movie.jpg" alt="Hunger Games">
+        <img src="/hungergames_movie.jpg" alt="<%= item.title %>">
         <div class="rating">
             <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
         </div>
     </div>
 
     <div class="info-section">
-        <h2>Hunger Games: The Mockingjay - Part 1</h2>
+        <h2><%= item.title %></h2>
+        <p class="creator">
+            <% if (item.author) { %>
+                <strong>Author:</strong> <%= item.author %><br>
+            <% } else if (item.producer) { %>
+                <strong>Producer:</strong> <%= item.producer %><br>
+            <% } %>
+            <strong>Release Year:</strong> <%= item.releaseYear %>
+        </p>
         <p class="description">
-            Katniss Everdeen reluctantly becomes the symbol of a mass rebellion against the autocratic Capitol.
+            <%= item.description %>
         </p>
         <div class="buttons">
-            <button class="edit-btn"><a href="/edit/1">Edit</a></button>
-            <button class="remove-btn">Remove</button>
+            <button class="edit-btn"><a href="/edit/<%= item._id %>">Edit</a></button>
+            <button class="remove-btn"><a href="/delete/<%= item._id %>">Remove</a></button>
         </div>
     </div>
 
     <div class="review-section">
         <h3>Reviews</h3>
-        <textarea placeholder="Write a comment..."></textarea>
-        <input type="text" placeholder="Username">
-        <button class="back-btn"><a href="/">Back</a></button>
-        <button class="comment-btn">Comment</button>
+        <form action="/comment/<%= item._id %>" method="POST">
+            <textarea name="text" placeholder="Write a comment..." required></textarea>
+            <input type="text" name="username" placeholder="Username" required>
+            <button type="button" class="back-btn"><a href="/">Back</a></button>
+            <button type="submit" class="comment-btn">Comment</button>
+        </form>
         <div class="comments">
-            <p><strong>User1:</strong> Amazing movie, highly recommended!</p>
-            <p><strong>User2:</strong> Loved the action scenes.</p>
+            <% if (item.comments && item.comments.length > 0) { %>
+                <% item.comments.forEach(comment => { %>
+                    <p><strong><%= comment.username %>:</strong> <%= comment.text %></p>
+                <% }); %>
+            <% } else { %>
+                <p>No comments yet. Be the first to comment!</p>
+            <% } %>
         </div>
     </div>
 </main>

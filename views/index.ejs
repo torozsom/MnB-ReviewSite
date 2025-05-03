@@ -2,29 +2,18 @@
 
 <main>
     <div class="catalog">
-        <div class="item">
-            <a href="/details/1">
-                <img src="/hungergames_movie.jpg" alt="Hunger Games">
-            </a>
-            <p>Hunger Games: The Mockingjay - Part 1</p>
-        </div>
-
-        <div class="item">
-            <img src="placeholder.jpg" alt="Movie/Book Cover">
-            <p>Title</p>
-        </div>
-        <div class="item">
-            <img src="placeholder.jpg" alt="Movie/Book Cover">
-            <p>Title</p>
-        </div>
-        <div class="item">
-            <img src="placeholder.jpg" alt="Movie/Book Cover">
-            <p>Title</p>
-        </div>
-        <div class="item">
-            <img src="placeholder.jpg" alt="Movie/Book Cover">
-            <p>Title</p>
-        </div>
+        <% if (locals.items && items.length > 0) { %>
+            <% items.forEach(item => { %>
+                <div class="item">
+                    <a href="/details/<%= item._id %>">
+                        <img src="/hungergames_movie.jpg" alt="<%= item.title %>">
+                    </a>
+                    <p><%= item.title %></p>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No items found.</p>
+        <% } %>
     </div>
 </main>
 

@@ -7,6 +7,11 @@
  */
 module.exports = (objRepo, view, options) => {
     return (req, res, next) => {
-        res.render(view, options);
+        // Merge options with session information
+        const renderOptions = {
+            ...options,
+            isAuthenticated: req.session?.isAuthenticated || false
+        };
+        res.render(view, renderOptions);
     }
 }

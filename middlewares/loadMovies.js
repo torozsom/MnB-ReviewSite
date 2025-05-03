@@ -4,7 +4,18 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-     return (req, res, next) => {
-        return next();
+    const MovieModel = objRepo.MovieModel;
+
+    return (req, res, next) => {
+        MovieModel.find({})
+            .then(movies => {
+                res.locals.items = movies;
+                return next();
+            })
+            .catch(err => {
+                console.error('Error loading movies:', err);
+                res.locals.items = [];
+                return next();
+            });
     }
 }

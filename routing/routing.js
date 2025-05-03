@@ -57,12 +57,19 @@ function subscribeToRoutes(app) {
         showNav: false
     }));
 
+    app.post('/login', loginMW(objRepo));
+
+    app.get('/logout', logoutMW(objRepo));
 
     app.get('/add', authMW(objRepo), renderMW(objRepo, 'add', {
         title: 'Add Item',
         stylesheet: '/add.css',
         showNav: false
     }));
+
+    app.post('/add', authMW(objRepo), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
+        res.redirect('/');
+    });
 
     app.get('/details/:id', loadItemMW(objRepo), renderMW(objRepo, 'details', {
         title: 'Details',
@@ -75,6 +82,16 @@ function subscribeToRoutes(app) {
         stylesheet: '/edit.css',
         showNav: false
     }));
+
+    app.post('/edit/:id', authMW(objRepo), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
+        res.redirect('/');
+    });
+
+    app.post('/comment/:id', authMW(objRepo), saveCommentMW(objRepo), (req, res) => {
+        res.redirect('/details/' + req.params.id);
+    });
+
+    app.get('/delete/:id', authMW(objRepo), deleteItemMW(objRepo));
 
     app.use((err, req, res, next) => {
         console.log('Error:', err);
