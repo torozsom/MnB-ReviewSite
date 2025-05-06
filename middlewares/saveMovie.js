@@ -28,12 +28,29 @@ module.exports = (objRepo) => {
         if (isNaN(releaseYear) || releaseYear < 1800 || releaseYear > new Date().getFullYear())
             return res.status(400).send('⚠️ Invalid release year.');
 
+        // Process image if uploaded
+        const imageData = req.file ? {
+            data: req.file.buffer,
+            contentType: req.file.mimetype
+        } : undefined;
 
         if (isEdit) {
+            // Create update object
+            const updateData = {
+                title,
+                producer,
+                releaseYear,
+                description
+            };
+
+            // Only update image if a new one was uploaded
+            if (imageData)
+                updateData.image = imageData;
+
             // Update existing movie
             MovieModel.findByIdAndUpdate(
                 req.params.id,
-                {title, producer, releaseYear, description},
+                updateData,
                 {new: true}
             )
                 .then(updatedMovie => {
@@ -53,7 +70,8 @@ module.exports = (objRepo) => {
                 title,
                 producer,
                 releaseYear,
-                description
+                description,
+                image: imageData
             });
 
             newMovie.save()

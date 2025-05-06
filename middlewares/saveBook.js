@@ -28,10 +28,28 @@ module.exports = (objRepo) => {
         if (isNaN(releaseYear) || releaseYear < 1800 || releaseYear > new Date().getFullYear())
             return res.status(400).send('⚠️ Invalid release year.');
 
+        // Process image if uploaded
+        const imageData = req.file ? {
+            data: req.file.buffer,
+            contentType: req.file.mimetype
+        } : undefined;
+
         if (isEdit) {
+            // Create update object
+            const updateData = {
+                title,
+                author,
+                releaseYear,
+                description
+            };
+
+            // Only update image if a new one was uploaded
+            if (imageData)
+                updateData.image = imageData;
+
             BookModel.findByIdAndUpdate(
                 req.params.id,
-                {title, author, releaseYear, description},
+                updateData,
                 {new: true}
             )
                 .then(updatedBook => {
@@ -51,7 +69,8 @@ module.exports = (objRepo) => {
                 title,
                 author,
                 releaseYear,
-                description
+                description,
+                image: imageData
             });
 
             newBook.save()

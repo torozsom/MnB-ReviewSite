@@ -3,9 +3,10 @@
 <main class="edit-container">
     <h2>Editing Item</h2>
 
-    <form action="/edit/<%= item._id %>" method="POST">
+    <form action="/edit/<%= item._id %>" method="POST" enctype="multipart/form-data">
         <label class="upload-label">
             Change Cover Picture
+            <input type="file" name="image" accept="image/*">
         </label>
 
         <input type="text" name="title" value="<%= item.title %>" required>

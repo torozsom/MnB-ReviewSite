@@ -19,8 +19,22 @@
                 <a href="/add">Add Item</a>
             <% } %>
 
-            <input type="text" placeholder="Search..." class="search-bar">
-            <button class="search-button">🔍</button>
+            <form id="searchForm" action="" method="GET" style="display: inline;">
+                <input type="text" name="search" placeholder="Search..." class="search-bar">
+                <button type="submit" class="search-button">🔍</button>
+            </form>
+            <script>
+                // Set the form action based on the current URL
+                document.addEventListener('DOMContentLoaded', function () {
+                    const searchForm = document.getElementById('searchForm');
+                    const currentPath = window.location.pathname;
+
+                    if (currentPath === '/books')
+                        searchForm.action = '/books';
+                    else
+                        searchForm.action = '/movies';
+                });
+            </script>
 
             <% if (locals.isAuthenticated) { %>
                 <a href="/logout">Log Out</a>

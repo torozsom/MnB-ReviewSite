@@ -1,12 +1,23 @@
 ﻿<%- include('header') %>
 
 <main>
+    <% if (locals.query && locals.query.search) { %>
+        <div class="search-results">
+            <h3>Search results for: "<%= locals.query.search %>"</h3>
+            <p><%= locals.items ? items.length : 0 %> items found</p>
+        </div>
+    <% } %>
     <div class="catalog">
         <% if (locals.items && items.length > 0) { %>
             <% items.forEach(item => { %>
                 <div class="item">
                     <a href="/details/<%= item._id %>">
-                        <img src="/hungergames_movie.jpg" alt="<%= item.title %>">
+                        <% if (item.image && item.image.data) { %>
+                            <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
+                                 alt="<%= item.title %>">
+                        <% } else { %>
+                            <img src="/placeholder.png" alt="<%= item.title %>">
+                        <% } %>
                     </a>
                     <p><%= item.title %></p>
                 </div>

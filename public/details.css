@@ -55,6 +55,41 @@ a {
     color: gold;
 }
 
+.rating-text {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.star {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star.active {
+    color: gold;
+}
+
+.star:hover {
+    color: #ffcc00;
+}
+
+.rating-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.rating-btn:hover {
+    opacity: 0.8;
+}
+
 
 .info-section {
     flex: 2;
@@ -109,7 +144,6 @@ a {
 .review-section {
     flex-basis: 100%;
     margin-top: 20px;
-    text-align: left;
 }
 
 
@@ -118,12 +152,13 @@ a {
 }
 
 
-textarea, input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
+input {
+    width: 50%;
+    padding: 20px;
+    margin: 10px 10px 10px 10px;
+    border: 1px solid gray;
     border-radius: 5px;
+    font-size: 16px;
 }
 
 
@@ -163,4 +198,20 @@ textarea, input {
     background: #f9f9f9;
     padding: 10px;
     border-radius: 5px;
+}
+
+.comment-date {
+    font-size: 0.85em;
+    color: #777;
+    font-style: italic;
+}
+
+.star {
+    font-size: 40px;
+}
+
+.rating-btn {
+    background-color: forestgreen;
+    padding: 10px;
+    width: 40%;
 }

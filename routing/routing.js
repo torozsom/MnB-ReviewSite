@@ -11,14 +11,28 @@ const deleteItemMW = require('../middlewares/deleteItem');
 const saveBookMW = require('../middlewares/saveBook');
 const saveMovieMW = require('../middlewares/saveMovie');
 const saveCommentMW = require('../middlewares/saveComment');
+const saveRatingMW = require('../middlewares/saveRating');
 
+const multer = require('multer');
+const storage = multer.memoryStorage(); // Store in memory before saving to DB
+const upload = multer({
+    storage: storage,
+    limits: {fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/'))
+            cb(null, true);
+        else
+            cb(new Error('Only images are allowed'), false);
+    }
+});
 
 const BookModel = require('../models/book');
 const MovieModel = require('../models/movie');
 const CommentModel = require('../models/comment');
 const UserModel = require('../models/user');
+const RatingModel = require('../models/rating');
 
-const objRepo = {BookModel, MovieModel, CommentModel, UserModel};
+const objRepo = {BookModel, MovieModel, CommentModel, UserModel, RatingModel};
 
 
 function subscribeToRoutes(app) {
@@ -67,7 +81,7 @@ function subscribeToRoutes(app) {
         showNav: false
     }));
 
-    app.post('/add', authMW(objRepo), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
+    app.post('/add', authMW(objRepo), upload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
         res.redirect('/');
     });
 
@@ -83,11 +97,15 @@ function subscribeToRoutes(app) {
         showNav: false
     }));
 
-    app.post('/edit/:id', authMW(objRepo), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
+    app.post('/edit/:id', authMW(objRepo), upload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
         res.redirect('/');
     });
 
     app.post('/comment/:id', authMW(objRepo), saveCommentMW(objRepo), (req, res) => {
+        res.redirect('/details/' + req.params.id);
+    });
+
+    app.post('/rate/:id', authMW(objRepo), saveRatingMW(objRepo), (req, res) => {
         res.redirect('/details/' + req.params.id);
     });
 

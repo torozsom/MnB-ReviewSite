@@ -2,10 +2,64 @@
 
 <main class="details-container">
     <div class="image-section">
-        <img src="/hungergames_movie.jpg" alt="<%= item.title %>">
-        <div class="rating">
-            <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
-        </div>
+        <% if (item.image && item.image.data) { %>
+            <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>" alt="<%= item.title %>">
+        <% } else { %>
+            <img src="/placeholder.png" alt="<%= item.title %>">
+        <% } %>
+        <p class="rating-text">Rating: <%= item.averageRating ? item.averageRating.toFixed(1) : '0.0' %> / 5</p>
+        <% if (locals.isAuthenticated) { %>
+            <div class="rating">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
+            <form action="/rate/<%= item._id %>" method="POST" id="ratingForm">
+                <input type="hidden" name="rating" id="ratingInput" value="<%= locals.userRating || '' %>">
+                <button type="submit" class="rating-btn">Submit</button>
+            </form>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const stars = document.querySelectorAll('.star');
+                    const ratingInput = document.getElementById('ratingInput');
+                    const userRating = <%= locals.userRating ? locals.userRating : 0 %>;
+
+                    // Set initial stars based on user's previous rating
+                    if (userRating > 0)
+                        updateStars(userRating);
+
+                    // Add click event to stars
+                    stars.forEach(star => {
+                        star.addEventListener('click', function () {
+                            const value = parseInt(this.getAttribute('data-value'));
+                            ratingInput.value = value;
+                            updateStars(value);
+                        });
+                    });
+
+                    function updateStars(value) {
+                        stars.forEach(star => {
+                            const starValue = parseInt(star.getAttribute('data-value'));
+                            if (starValue <= value) {
+                                star.textContent = '★';
+                                star.classList.add('active');
+                            } else {
+                                star.textContent = '☆';
+                                star.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            </script>
+        <% } else { %>
+            <div class="rating">
+                <% for (let i = 1; i <= 5; i++) { %>
+                    <span><%= i <= Math.round(item.averageRating || 0) ? '★' : '☆' %></span>
+                <% } %>
+            </div>
+        <% } %>
     </div>
 
     <div class="info-section">
@@ -21,29 +75,51 @@
         <p class="description">
             <%= item.description %>
         </p>
-        <div class="buttons">
-            <button class="edit-btn"><a href="/edit/<%= item._id %>">Edit</a></button>
-            <button class="remove-btn"><a href="/delete/<%= item._id %>">Remove</a></button>
-        </div>
+
+        <% if (locals.isAuthenticated) { %>
+            <div class="buttons">
+                <button class="edit-btn"><a href="/edit/<%= item._id %>">Edit</a></button>
+                <button class="remove-btn" onclick="confirmDelete('<%= item._id %>', '<%= item.title %>')">Remove
+                </button>
+
+                <script>
+                    function confirmDelete(itemId, itemTitle) {
+                        if (confirm(`Are you sure you want to remove "${itemTitle}"?`)) {
+                            window.location.href = `/delete/${itemId}`;
+                        }
+                    }
+                </script>
+            </div>
+        <% } %>
     </div>
 
     <div class="review-section">
         <h3>Reviews</h3>
-        <form action="/comment/<%= item._id %>" method="POST">
-            <textarea name="text" placeholder="Write a comment..." required></textarea>
-            <input type="text" name="username" placeholder="Username" required>
-            <button type="button" class="back-btn"><a href="/">Back</a></button>
-            <button type="submit" class="comment-btn">Comment</button>
-        </form>
+        <% if (locals.isAuthenticated) { %>
+            <form action="/comment/<%= item._id %>" method="POST">
+                <input name="text" placeholder="Write a comment..." required>
+                <button type="submit" class="comment-btn">Comment</button>
+            </form>
+        <% } %>
         <div class="comments">
             <% if (item.comments && item.comments.length > 0) { %>
                 <% item.comments.forEach(comment => { %>
-                    <p><strong><%= comment.username %>:</strong> <%= comment.text %></p>
+                    <p><strong><%= comment.username %>:</strong>
+                        <%= comment.text %>
+                        <span class="comment-date">
+                            (<%= comment.date ? comment.date.getFullYear() + '.' +
+                                    String(comment.date.getMonth() + 1).padStart(2, '0') + '.' +
+                                    String(comment.date.getDate()).padStart(2, '0') + '. ' +
+                                    String(comment.date.getHours()).padStart(2, '0') + ':' +
+                                    String(comment.date.getMinutes()).padStart(2, '0')
+                                    : 'No date' %>)
+                        </span></p>
                 <% }); %>
             <% } else { %>
                 <p>No comments yet. Be the first to comment!</p>
             <% } %>
         </div>
+        <button type="button" class="back-btn"><a href="/">Back</a></button>
     </div>
 </main>
 

@@ -3,7 +3,9 @@ const db = require('../config/db');
 
 const User = db.model('User', new Schema({
     username: String,
+
     email: String,
+
     password: String
 }));
 

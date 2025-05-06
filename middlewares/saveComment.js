@@ -7,15 +7,16 @@ module.exports = (objRepo) => {
     const CommentModel = objRepo.CommentModel;
 
     return (req, res, next) => {
+
+        const username = req.session.username;
+
         // Extract data from request body
-        const username = req.body.username;
         const text = req.body.text;
         const itemId = req.params.id;
 
         // Validate required fields
-        if (!username || !text || !itemId) {
+        if (!username || !text || !itemId)
             return res.status(400).send('⚠️ All fields are required.');
-        }
 
         // Determine if the item is a book or movie
         const BookModel = objRepo.BookModel;
