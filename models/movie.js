@@ -4,7 +4,7 @@ const db = require('../config/db');
 const Movie = db.model('Movie', new Schema({
     title: String,
 
-    producer: String,
+    director: String,
 
     releaseYear: Number,
 

@@ -12,14 +12,14 @@ module.exports = (objRepo) => {
      * Validates movie data from the request
      *
      * @param title - Movie title
-     * @param producer - Movie producer
+     * @param director - Movie director
      * @param releaseYear - Movie release year
      * @param description - Movie description
      * @returns {string|null} - Error message or null if valid
      */
-    function validateMovieData(title, producer, releaseYear, description) {
+    function validateMovieData(title, director, releaseYear, description) {
         // Validate required fields
-        if (!title || !producer || !releaseYear || !description)
+        if (!title || !director || !releaseYear || !description)
             return '⚠️  All fields are required.';
 
         // Validate release year
@@ -58,9 +58,9 @@ module.exports = (objRepo) => {
             {new: true}
         )
             .then(updatedMovie => {
-                if (!updatedMovie) {
+                if (!updatedMovie)
                     throw new Error('⚠️  Movie not found.');
-                }
+
                 console.log('✅  Movie updated successfully:', updatedMovie.title);
                 return updatedMovie;
             });
@@ -87,18 +87,18 @@ module.exports = (objRepo) => {
         // Check if we're adding a new movie or editing an existing one
         const isEdit = req.params.id !== undefined;
 
-        // For add form, only process if itemType is 'movie'
-        if (!isEdit && req.body.itemType !== 'movie')
+        // Only process if itemType is 'movie' (for both add and edit forms)
+        if (req.body.itemType !== 'movie')
             return next();
 
         // Extract data from request body
         const title = req.body.title;
-        const producer = req.body.creator;
+        const director = req.body.creator;
         const releaseYear = parseInt(req.body.year);
         const description = req.body.description;
 
         // Validate movie data
-        const validationError = validateMovieData(title, producer, releaseYear, description);
+        const validationError = validateMovieData(title, director, releaseYear, description);
         if (validationError)
             return res.status(400).send(validationError);
 
@@ -109,7 +109,7 @@ module.exports = (objRepo) => {
             // Create update object
             const updateData = {
                 title,
-                producer,
+                director,
                 releaseYear,
                 description
             };
@@ -124,9 +124,9 @@ module.exports = (objRepo) => {
                     res.redirect('/movies');
                 })
                 .catch(err => {
-                    if (err.message === '⚠️  Movie not found.') {
+                    if (err.message === '⚠️  Movie not found.')
                         return res.status(404).send(err.message);
-                    }
+
                     console.error('Error updating movie:', err);
                     next(err);
                 });
@@ -134,7 +134,7 @@ module.exports = (objRepo) => {
             // Create new movie data object
             const movieData = {
                 title,
-                producer,
+                director,
                 releaseYear,
                 description,
                 image: imageData

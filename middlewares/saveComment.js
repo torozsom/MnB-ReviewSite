@@ -37,18 +37,15 @@ module.exports = (objRepo) => {
         return BookModel.findById(itemId)
             .then(book => {
                 if (book) {
-                    // Item is a book
                     return {item: book, modelType: 'Book'};
                 } else {
                     // Try to find the item as a movie
                     return MovieModel.findById(itemId)
                         .then(movie => {
-                            if (movie) {
-                                // Item is a movie
+                            if (movie)
                                 return {item: movie, modelType: 'Movie'};
-                            } else {
+                            else
                                 return null;
-                            }
                         });
                 }
             });
@@ -95,9 +92,8 @@ module.exports = (objRepo) => {
         // Find the item
         findItem(itemId)
             .then(result => {
-                if (!result) {
+                if (!result)
                     return res.status(404).send('⚠️  Item not found.');
-                }
 
                 // Save the comment
                 return saveComment(username, text, itemId, result.modelType)
@@ -111,4 +107,4 @@ module.exports = (objRepo) => {
             });
     };
 
-};
+}

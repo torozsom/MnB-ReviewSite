@@ -58,9 +58,9 @@ module.exports = (objRepo) => {
             {new: true}
         )
             .then(updatedBook => {
-                if (!updatedBook) {
+                if (!updatedBook)
                     throw new Error('⚠️  Book not found.');
-                }
+
                 console.log('✅  Book updated successfully:', updatedBook.title);
                 return updatedBook;
             });
@@ -87,13 +87,13 @@ module.exports = (objRepo) => {
         // Check if we're adding a new book or editing an existing one
         const isEdit = req.params.id !== undefined;
 
-        // For add form, only process if itemType is 'book'
-        if (!isEdit && req.body.itemType !== 'book')
+        // Only process if itemType is 'book' (for both add and edit forms)
+        if (req.body.itemType !== 'book')
             return next();
 
         // Extract data from request body
         const title = req.body.title;
-        const author = req.body.creator; // In the form, it's called 'producer' for both books and movies
+        const author = req.body.creator; // 'creator' is used in the form
         const releaseYear = parseInt(req.body.year);
         const description = req.body.description;
 
@@ -124,9 +124,9 @@ module.exports = (objRepo) => {
                     res.redirect('/books');
                 })
                 .catch(err => {
-                    if (err.message === '⚠️  Book not found.') {
+                    if (err.message === '⚠️  Book not found.')
                         return res.status(404).send(err.message);
-                    }
+
                     console.error('Error updating book:', err);
                     next(err);
                 });
@@ -152,4 +152,4 @@ module.exports = (objRepo) => {
         }
     };
 
-};
+}

@@ -1,5 +1,6 @@
 /**
  * Saves a rating of an item from a user to the database.
+ *
  * @param objRepo
  * @returns {function(*, *, *): *}
  */
@@ -15,11 +16,11 @@ module.exports = (objRepo) => {
 
         // Validate required fields
         if (!username || !rating || !itemId)
-            return res.status(400).send('⚠️ All fields are required.');
+            return res.status(400).send('⚠️  All fields are required.');
 
         // Validate rating value
         if (rating < 1 || rating > 5)
-            return res.status(400).send('⚠️ Rating must be between 1 and 5.');
+            return res.status(400).send('⚠️  Rating must be between 1 and 5.');
 
         // Determine if the item is a book or movie
         const BookModel = objRepo.BookModel;
@@ -29,18 +30,15 @@ module.exports = (objRepo) => {
         BookModel.findById(itemId)
             .then(book => {
                 if (book) {
-                    // Item is a book
                     return saveRating('Book', itemId, book);
                 } else {
                     // Try to find the item as a movie
                     return MovieModel.findById(itemId)
                         .then(movie => {
-                            if (movie) {
-                                // Item is a movie
+                            if (movie)
                                 return saveRating('Movie', itemId, movie);
-                            } else {
+                            else
                                 return res.status(404).send('⚠️ Item not found.');
-                            }
                         });
                 }
             })
@@ -126,4 +124,5 @@ module.exports = (objRepo) => {
                 });
         }
     };
-};
+
+}

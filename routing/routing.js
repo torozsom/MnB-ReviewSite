@@ -17,7 +17,7 @@ const multer = require('multer');
 const storage = multer.memoryStorage(); // Store in memory before saving to DB
 const upload = multer({
     storage: storage,
-    limits: {fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: {fileSize: 5 * 1024 * 1024}, // 5MB limit
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/'))
             cb(null, true);
@@ -55,7 +55,6 @@ function subscribeToRoutes(app) {
         showNav: true
     }));
 
-
     app.get('/register', renderMW(objRepo, 'register', {
         title: 'Register',
         stylesheet: '/auth.css',
@@ -63,7 +62,6 @@ function subscribeToRoutes(app) {
     }));
 
     app.post('/register', registerMW(objRepo));
-
 
     app.get('/login', renderMW(objRepo, 'login', {
         title: 'Login',

@@ -9,8 +9,9 @@
             <input type="file" name="image" accept="image/*">
         </label>
 
+        <input type="hidden" name="itemType" value="<%= item.author ? 'book' : 'movie' %>">
         <input type="text" name="title" value="<%= item.title %>" required>
-        <input type="text" name="creator" value="<%= item.author || item.producer %>" required>
+        <input type="text" name="creator" value="<%= item.author || item.director %>" required>
         <input type="number" name="year" value="<%= item.releaseYear %>" min="1800" max="2099" required>
         <textarea name="description" rows="4" required><%= item.description %></textarea>
 

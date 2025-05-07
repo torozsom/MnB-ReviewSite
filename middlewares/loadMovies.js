@@ -1,6 +1,6 @@
 ﻿/**
  * Loads all movies from the database.
- * If a search query is provided, filters movies by title or producer.
+ * If a search query is provided, filters movies by title or director.
  *
  * @param objRepo
  * @returns {function(*, *, *): *}
@@ -16,11 +16,11 @@ module.exports = (objRepo) => {
         res.locals.query = req.query;
 
         if (searchQuery) {
-            // Search in title or producer fields
+            // Search in title or director fields
             query = {
                 $or: [
                     {title: {$regex: searchQuery, $options: 'i'}},
-                    {producer: {$regex: searchQuery, $options: 'i'}}
+                    {director: {$regex: searchQuery, $options: 'i'}}
                 ]
             };
         }

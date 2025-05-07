@@ -93,18 +93,15 @@ module.exports = (objRepo) => {
         deleteBook(itemId)
             .then(result => {
                 if (result) {
-                    // Item was a book and has been deleted
                     return deleteComments(itemId, result.modelType);
                 } else {
                     // Try to find and delete the item as a movie
                     return deleteMovie(itemId)
                         .then(result => {
-                            if (result) {
-                                // Item was a movie and has been deleted
+                            if (result)
                                 return deleteComments(itemId, result.modelType);
-                            } else {
+                            else
                                 return res.status(404).send('⚠️  Item not found.');
-                            }
                         });
                 }
             })
@@ -118,4 +115,4 @@ module.exports = (objRepo) => {
             });
     };
 
-};
+}

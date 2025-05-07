@@ -35,5 +35,6 @@ module.exports = (objRepo) => {
                 res.locals.items = [];
                 return next();
             });
-    }
+    };
+
 }

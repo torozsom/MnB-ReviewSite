@@ -3,7 +3,8 @@
 <main class="details-container">
     <div class="image-section">
         <% if (item.image && item.image.data) { %>
-            <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>" alt="<%= item.title %>">
+            <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
+                 alt="<%= item.title %>">
         <% } else { %>
             <img src="/placeholder.png" alt="<%= item.title %>">
         <% } %>
@@ -67,8 +68,8 @@
         <p class="creator">
             <% if (item.author) { %>
                 <strong>Author:</strong> <%= item.author %><br>
-            <% } else if (item.producer) { %>
-                <strong>Producer:</strong> <%= item.producer %><br>
+            <% } else if (item.director) { %>
+                <strong>Director:</strong> <%= item.director %><br>
             <% } %>
             <strong>Release Year:</strong> <%= item.releaseYear %>
         </p>
