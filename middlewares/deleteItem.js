@@ -1,5 +1,6 @@
 ﻿/**
  * Deletes a book or movie from the database.
+ *
  * @param objRepo
  * @returns {function(*, *, *): *}
  */
@@ -8,31 +9,101 @@ module.exports = (objRepo) => {
     const MovieModel = objRepo.MovieModel;
     const CommentModel = objRepo.CommentModel;
 
+
+    /**
+     * Validates that the item ID is provided
+     *
+     * @param itemId - ID of the item to delete
+     * @returns {string|null} - Error message or null if valid
+     */
+    function validateItemId(itemId) {
+        if (!itemId)
+            return '⚠️  Item ID is required.';
+
+        return null;
+    }
+
+
+    /**
+     * Deletes a book by ID
+     *
+     * @param itemId - ID of the book to delete
+     * @returns {Promise<*>} - Promise resolving to the deleted book or null if not found
+     */
+    function deleteBook(itemId) {
+        return BookModel.findByIdAndDelete(itemId)
+            .then(deletedBook => {
+                if (deletedBook) {
+                    console.log('✅  Book deleted successfully:', deletedBook.title);
+                    return {item: deletedBook, modelType: 'Book'};
+                }
+                return null;
+            });
+    }
+
+
+    /**
+     * Deletes a movie by ID
+     *
+     * @param itemId - ID of the movie to delete
+     * @returns {Promise<*>} - Promise resolving to the deleted movie or null if not found
+     */
+    function deleteMovie(itemId) {
+        return MovieModel.findByIdAndDelete(itemId)
+            .then(deletedMovie => {
+                if (deletedMovie) {
+                    console.log('✅  Movie deleted successfully:', deletedMovie.title);
+                    return {item: deletedMovie, modelType: 'Movie'};
+                }
+                return null;
+            });
+    }
+
+
+    /**
+     * Deletes comments associated with an item
+     *
+     * @param itemId - ID of the item
+     * @param modelType - Type of the model ('Book' or 'Movie')
+     * @returns {Promise<*>} - Promise resolving when comments are deleted
+     */
+    function deleteComments(itemId, modelType) {
+        return CommentModel.deleteMany({
+            _assignedTo: itemId,
+            onModel: modelType
+        })
+            .then(result => {
+                console.log(`✅  Deleted ${result.deletedCount} comments associated with the item.`);
+            })
+            .catch(err => {
+                console.error('Error deleting comments:', err);
+            });
+    }
+
+
     return (req, res, next) => {
         const itemId = req.params.id;
 
-        if (!itemId)
-            return res.status(400).send('⚠️ Item ID is required.');
+        // Validate item ID
+        const validationError = validateItemId(itemId);
+        if (validationError)
+            return res.status(400).send(validationError);
 
-        // First try to find and delete the item as a book
-        BookModel.findByIdAndDelete(itemId)
-            .then(deletedBook => {
-                if (deletedBook) {
+        // Try to delete the item as a book first, then as a movie if not found
+        deleteBook(itemId)
+            .then(result => {
+                if (result) {
                     // Item was a book and has been deleted
-                    console.log('✅ Book deleted successfully:', deletedBook.title);
-                    // Delete all comments associated with this book
-                    return deleteComments(itemId, 'Book');
+                    return deleteComments(itemId, result.modelType);
                 } else {
                     // Try to find and delete the item as a movie
-                    return MovieModel.findByIdAndDelete(itemId)
-                        .then(deletedMovie => {
-                            if (deletedMovie) {
+                    return deleteMovie(itemId)
+                        .then(result => {
+                            if (result) {
                                 // Item was a movie and has been deleted
-                                console.log('✅ Movie deleted successfully:', deletedMovie.title);
-                                // Delete all comments associated with this movie
-                                return deleteComments(itemId, 'Movie');
+                                return deleteComments(itemId, result.modelType);
                             } else {
-                                return res.status(404).send('⚠️ Item not found.');
+                                return res.status(404).send('⚠️  Item not found.');
                             }
                         });
                 }
@@ -45,18 +116,6 @@ module.exports = (objRepo) => {
                 console.error('Error deleting item:', err);
                 next(err);
             });
-
-        function deleteComments(itemId, modelType) {
-            return CommentModel.deleteMany({
-                _assignedTo: itemId,
-                onModel: modelType
-            })
-                .then(result => {
-                    console.log(`✅ Deleted ${result.deletedCount} comments associated with the item.`);
-                })
-                .catch(err => {
-                    console.error('Error deleting comments:', err);
-                });
-        }
     };
+
 };

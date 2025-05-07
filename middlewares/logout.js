@@ -1,5 +1,6 @@
 ﻿/**
  * Logs out the user by destroying the session.
+ *
  * @param objRepo
  * @returns {function(*, *, *): *}
  */

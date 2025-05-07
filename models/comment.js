@@ -3,7 +3,9 @@ const db = require('../config/db');
 
 const Comment = db.model('Comment', new Schema({
     username: String,
+
     text: String,
+
     date: Date,
 
     _assignedTo: {

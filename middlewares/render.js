@@ -1,5 +1,6 @@
 ﻿/**
  * Renders an HTML page using the appropriate template.
+ *
  * @param objRepo
  * @param view
  * @param options
@@ -13,5 +14,5 @@ module.exports = (objRepo, view, options) => {
             isAuthenticated: req.session?.isAuthenticated || false
         };
         res.render(view, renderOptions);
-    }
+    };
 }

@@ -49,6 +49,18 @@ module.exports = (objRepo) => {
                 next(err);
             });
 
+
+        /**
+         * Saves a rating for a specific item to the database. If a rating from the
+         * user already exists, it updates the existing rating; otherwise, it creates
+         * a new rating entity. After saving, it triggers an update for the item's
+         * average rating.
+         *
+         * @param {string} modelType - The type of model being rated (e.g., 'Book' or 'Movie').
+         * @param {string} itemId - The ID of the item being rated.
+         * @param {Object} item - The item document (Book or Movie) to update with the rating.
+         * @returns {Promise} - Resolves when the rating is saved and the average is updated.
+         */
         function saveRating(modelType, itemId, item) {
             // Check if user has already rated this item
             return RatingModel.findOne({
@@ -77,6 +89,17 @@ module.exports = (objRepo) => {
                 });
         }
 
+
+        /**
+         * Updates the average rating and rating count of an item based on all ratings
+         * for that item in the database. If no ratings exist, sets the average
+         * to 0. Saves the updated item back to the database.
+         *
+         * @param {string} modelType - The type of model being rated (e.g., 'Book' or 'Movie').
+         * @param {string} itemId - The ID of the item for which the average rating will be calculated.
+         * @param {Object} item - The item document (Book or Movie) to update with the average rating.
+         * @returns {Promise} - Resolves when the item's average rating is updated and saved.
+         */
         function updateAverageRating(modelType, itemId, item) {
             return RatingModel.find({
                 _assignedTo: itemId,

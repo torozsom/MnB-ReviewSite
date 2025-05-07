@@ -1,6 +1,7 @@
 ﻿/**
  * Loads all movies from the database.
  * If a search query is provided, filters movies by title or producer.
+ *
  * @param objRepo
  * @returns {function(*, *, *): *}
  */
@@ -34,5 +35,6 @@ module.exports = (objRepo) => {
                 res.locals.items = [];
                 return next();
             });
-    }
+    };
+
 }
