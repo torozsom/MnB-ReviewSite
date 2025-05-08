@@ -12,7 +12,9 @@
 
 ## 📋 Overview
 
-**M&B Reviews** is a full-featured web application that allows users to discover, review, and discuss their favorite movies and books. Built with Node.js and MongoDB, this platform offers a seamless experience for entertainment enthusiasts to share their opinions and explore new content.
+**M&B Reviews** is a full-featured web application that allows users to discover, review, and discuss their favorite
+movies and books. Built with Node.js and MongoDB, this platform offers a seamless experience for entertainment
+enthusiasts to share their opinions and explore new content.
 
 ---
 
@@ -24,7 +26,6 @@
 - **🔍 Powerful Search**: Find exactly what you're looking for with our intuitive search functionality
 - **👤 User Accounts**: Register, login, and maintain your personal profile
 - **🔒 Secure Authentication**: Protected routes ensure only authorized users can perform certain actions
-- **📱 Responsive Design**: Enjoy a seamless experience across all devices
 - **🖼️ Media Upload**: Add cover images to enhance visual appeal
 - **🛠️ CRUD Operations**: Full create, read, update, and delete functionality for all content
 
@@ -32,20 +33,21 @@
 
 ## 🧠 Technology Stack
 
-| Component     | Technology                                                |
-|---------------|----------------------------------------------------------|
-| **Backend**   | Node.js, Express.js                                       |
-| **Frontend**  | EJS templates, Vanilla CSS                                |
-| **Database**  | MongoDB with Mongoose ODM                                 |
-| **Auth**      | Express-session                                           |
-| **File Upload** | Multer                                                  |
-| **Development** | Nodemon                                                 |
+| Component       | Technology                 |
+|-----------------|----------------------------|
+| **Backend**     | Node.js, Express.js        |
+| **Frontend**    | EJS templates, Vanilla CSS |
+| **Database**    | MongoDB with Mongoose ODM  |
+| **Auth**        | Express-session            |
+| **File Upload** | Multer                     |
+| **Development** | Nodemon                    |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - npm (v6 or higher)
 - MongoDB (v4 or higher)
@@ -64,8 +66,8 @@
    ```
 
 3. **Configure environment**
-   - Make sure MongoDB is running on your local machine
-   - Create a `.env` file in the root directory (optional for custom configuration)
+    - Make sure MongoDB is running on your local machine
+    - Create a `.env` file in the root directory (optional for custom configuration)
 
 4. **Start the application**
    ```bash
@@ -75,23 +77,25 @@
    ```
 
 5. **Access the application**
-   - Open your browser and navigate to: http://localhost:3000
+    - Open your browser and navigate to: http://localhost:3000
 
 ---
 
 ## 🧭 Usage Guide
 
 ### For Visitors
+
 - Browse the homepage to see featured movies and books
 - Use the search functionality to find specific titles
 - View details, ratings, and comments for any item
 - Register for an account to unlock additional features
 
 ### For Registered Users
+
 - Rate movies and books on a 5-star scale
 - Leave comments and engage in discussions
 - Add new movies and books to the database
-- Edit or delete your own contributions
+- Edit or delete items
 
 ---
 

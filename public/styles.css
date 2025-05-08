@@ -6,6 +6,15 @@
     background-color: #aaaaaa;
 }
 
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
 
 header {
     background-color: #222;
@@ -54,6 +63,10 @@ nav a:hover {
     cursor: pointer;
     margin-left: 5px;
     width: 45px;
+}
+
+#searchForm {
+    display: inline;
 }
 
 
