@@ -23,8 +23,8 @@ enthusiasts to share their opinions and explore new content.
 - **📚 Comprehensive Media Library**: Browse, search, and filter through an extensive collection of movies and books
 - **⭐ Rating System**: Rate items on a 5-star scale and see community average ratings
 - **💬 Interactive Comments**: Engage in discussions with other users through the commenting system
-- **🔍 Powerful Search**: Find exactly what you're looking for with our intuitive search functionality
-- **👤 User Accounts**: Register, login, and maintain your personal profile
+- **🔍 Powerful Search**: Find exactly what you're looking for with intuitive search functionality
+- **👤 User Accounts**: Register, login, and interact
 - **🔒 Secure Authentication**: Protected routes ensure only authorized users can perform certain actions
 - **🖼️ Media Upload**: Add cover images to enhance visual appeal
 - **🛠️ CRUD Operations**: Full create, read, update, and delete functionality for all content
