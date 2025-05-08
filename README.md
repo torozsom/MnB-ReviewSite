@@ -4,7 +4,6 @@
   <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express.js">
   <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
-  <img src="https://img.shields.io/badge/bootstrap-%23563D7C.svg?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap">
 </div>
 
 <div align="center">
@@ -14,8 +13,6 @@
 ## 📋 Overview
 
 **M&B Reviews** is a full-featured web application that allows users to discover, review, and discuss their favorite movies and books. Built with Node.js and MongoDB, this platform offers a seamless experience for entertainment enthusiasts to share their opinions and explore new content.
-
-![M&B Reviews Screenshot](https://via.placeholder.com/800x400?text=M%26B+Reviews+Screenshot)
 
 ---
 
@@ -113,26 +110,6 @@ MnB_ReviewSite/
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add some amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-Please make sure to update tests as appropriate and adhere to the existing coding style.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Acknowledgements
 
 - [Express.js](https://expressjs.com/) - The web framework used
@@ -144,6 +121,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  <p>Made with ❤️ by the M&B Reviews Team</p>
   <p>© 2025 M&B Reviews. All rights reserved.</p>
 </div>
