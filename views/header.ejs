@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="<%= stylesheet %>">
 </head>
 <body>
+<% if (locals.successMessage) { %>
+    <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 10px; border-radius: 4px; text-align: center;">
+        <%= successMessage %>
+    </div>
+<% } %>
 <header>
     <h1>M&B Reviews</h1>
 

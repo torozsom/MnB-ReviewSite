@@ -72,14 +72,12 @@ module.exports = (objRepo) => {
         // Authenticate user
         authenticateUser(username, password)
             .then(user => {
-                // Set up user session
                 setupUserSession(req, user);
                 res.redirect('/');
             })
             .catch(err => {
-                if (err.message.startsWith('⚠️')) {
+                if (err.message.startsWith('⚠️'))
                     return res.status(400).send(err.message);
-                }
                 next(err);
             });
     };

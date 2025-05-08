@@ -83,12 +83,13 @@ module.exports = (objRepo) => {
         checkExistingUser(username, email)
             .then(() => createUser(username, email, password))
             .then(() => {
+                // Add success message to session
+                req.session.successMessage = '✅ Registration successful! You can now log in.';
                 res.redirect('/');
             })
             .catch(err => {
-                if (err.message.startsWith('⚠️')) {
+                if (err.message.startsWith('⚠️'))
                     return res.status(400).send(err.message);
-                }
                 next(err);
             });
     };
