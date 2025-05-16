@@ -1,29 +1,42 @@
 ﻿<%- include('header') %>
 
-<main>
+<main class="container py-4">
     <% if (locals.query && locals.query.search) { %>
-        <div class="search-results">
-            <h3>Search results for: "<%= locals.query.search %>"</h3>
-            <p><%= locals.items ? items.length : 0 %> items found</p>
+        <div class="alert alert-info mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Search results for: "<%= locals.query.search %>"</h4>
+                <span class="badge bg-secondary"><%= locals.items ? items.length : 0 %> items found</span>
+            </div>
         </div>
     <% } %>
-    <div class="catalog">
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         <% if (locals.items && items.length > 0) { %>
             <% items.forEach(item => { %>
-                <div class="item">
-                    <a href="/details/<%= item._id %>">
-                        <% if (item.image && item.image.data) { %>
-                            <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
-                                 alt="<%= item.title %>">
-                        <% } else { %>
-                            <img src="/placeholder.png" alt="<%= item.title %>">
-                        <% } %>
-                    </a>
-                    <p><%= item.title %></p>
+                <div class="col">
+                    <div class="card h-100 shadow-sm hover-card">
+                        <a href="/details/<%= item._id %>" class="text-decoration-none">
+                            <div class="card-img-top">
+                                <% if (item.image && item.image.data) { %>
+                                    <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
+                                         alt="<%= item.title %>">
+                                <% } else { %>
+                                    <img src="/placeholder.png" alt="<%= item.title %>">
+                                <% } %>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center text-dark"><%= item.title %></h5>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             <% }); %>
         <% } else { %>
-            <p>No items found.</p>
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i> No items found.
+                </div>
+            </div>
         <% } %>
     </div>
 </main>

@@ -1,126 +1,180 @@
 ﻿<%- include('header') %>
 
-<main class="details-container">
-    <div class="image-section">
-        <% if (item.image && item.image.data) { %>
-            <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
-                 alt="<%= item.title %>">
-        <% } else { %>
-            <img src="/placeholder.png" alt="<%= item.title %>">
-        <% } %>
-        <p class="rating-text">Rating: <%= item.averageRating ? item.averageRating.toFixed(1) : '0.0' %> / 5</p>
-        <% if (locals.isAuthenticated) { %>
-            <div class="rating">
-                <span class="star" data-value="1">☆</span>
-                <span class="star" data-value="2">☆</span>
-                <span class="star" data-value="3">☆</span>
-                <span class="star" data-value="4">☆</span>
-                <span class="star" data-value="5">☆</span>
-            </div>
-            <form action="/rate/<%= item._id %>" method="POST" id="ratingForm">
-                <input type="hidden" name="rating" id="ratingInput" value="<%= locals.userRating || '' %>">
-                <button type="submit" class="rating-btn">Submit</button>
-            </form>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const stars = document.querySelectorAll('.star');
-                    const ratingInput = document.getElementById('ratingInput');
-                    const userRating = <%= locals.userRating ? locals.userRating : 0 %>;
+<main class="container py-4">
+    <div class="card shadow mb-4">
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <!-- Image Section -->
+                <div class="col-md-4 p-4 text-center border-end">
+                    <% if (item.image && item.image.data) { %>
+                        <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
+                             alt="<%= item.title %>" class="img-fluid rounded shadow-sm">
+                    <% } else { %>
+                        <img src="/placeholder.png" alt="<%= item.title %>" class="img-fluid rounded shadow-sm">
+                    <% } %>
 
-                    // Set initial stars based on user's previous rating
-                    if (userRating > 0)
-                        updateStars(userRating);
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <div class="badge bg-primary fs-6 p-2">
+                                <i class="bi bi-star-fill me-1"></i>
+                                <%= item.averageRating ? item.averageRating.toFixed(1) : '0.0' %> / 5
+                            </div>
+                        </div>
 
-                    // Add click event to stars
-                    stars.forEach(star => {
-                        star.addEventListener('click', function () {
-                            const value = parseInt(this.getAttribute('data-value'));
-                            ratingInput.value = value;
-                            updateStars(value);
-                        });
-                    });
+                        <% if (locals.isAuthenticated) { %>
+                            <div class="rating my-2">
+                                <span class="star" data-value="1">☆</span>
+                                <span class="star" data-value="2">☆</span>
+                                <span class="star" data-value="3">☆</span>
+                                <span class="star" data-value="4">☆</span>
+                                <span class="star" data-value="5">☆</span>
+                            </div>
+                            <form action="/rate/<%= item._id %>" method="POST" id="ratingForm">
+                                <input type="hidden" name="rating" id="ratingInput"
+                                       value="<%= locals.userRating || '' %>">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle me-1"></i> Submit Rating
+                                </button>
+                            </form>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const stars = document.querySelectorAll('.star');
+                                    const ratingInput = document.getElementById('ratingInput');
+                                    const userRating = <%= locals.userRating ? locals.userRating : 0 %>;
 
-                    function updateStars(value) {
-                        stars.forEach(star => {
-                            const starValue = parseInt(star.getAttribute('data-value'));
-                            if (starValue <= value) {
-                                star.textContent = '★';
-                                star.classList.add('active');
-                            } else {
-                                star.textContent = '☆';
-                                star.classList.remove('active');
+                                    // Set initial stars based on user's previous rating
+                                    if (userRating > 0)
+                                        updateStars(userRating);
+
+                                    // Add click event to stars
+                                    stars.forEach(star => {
+                                        star.addEventListener('click', function () {
+                                            const value = parseInt(this.getAttribute('data-value'));
+                                            ratingInput.value = value;
+                                            updateStars(value);
+                                        });
+                                    });
+
+                                    function updateStars(value) {
+                                        stars.forEach(star => {
+                                            const starValue = parseInt(star.getAttribute('data-value'));
+                                            if (starValue <= value) {
+                                                star.textContent = '★';
+                                                star.classList.add('active');
+                                            } else {
+                                                star.textContent = '☆';
+                                                star.classList.remove('active');
+                                            }
+                                        });
+                                    }
+                                });
+                            </script>
+                        <% } else { %>
+                            <div class="rating my-2">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <span class="star"><%= i <= Math.round(item.averageRating || 0) ? '★' : '☆' %></span>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="col-md-8 p-4">
+                    <h2 class="card-title mb-3 fw-bold"><%= item.title %></h2>
+                    <div class="mb-3">
+                        <% if (item.author) { %>
+                            <p class="mb-1"><span class="fw-bold text-secondary">Author:</span> <%= item.author %></p>
+                        <% } else if (item.director) { %>
+                            <p class="mb-1"><span class="fw-bold text-secondary">Director:</span> <%= item.director %>
+                            </p>
+                        <% } %>
+                        <p class="mb-3"><span
+                                    class="fw-bold text-secondary">Release Year:</span> <%= item.releaseYear %></p>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Description</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"><%= item.description %></p>
+                        </div>
+                    </div>
+
+                    <% if (locals.isAuthenticated) { %>
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="/edit/<%= item._id %>" class="btn btn-warning">
+                                <i class="bi bi-pencil-fill me-1"></i> Edit
+                            </a>
+                            <button class="btn btn-danger"
+                                    onclick="confirmDelete('<%= item._id %>', '<%= item.title %>')">
+                                <i class="bi bi-trash-fill me-1"></i> Remove
+                            </button>
+                        </div>
+
+                        <script>
+                            function confirmDelete(itemId, itemTitle) {
+                                if (confirm(`Are you sure you want to remove "${itemTitle}"?`)) {
+                                    window.location.href = `/delete/${itemId}`;
+                                }
                             }
-                        });
-                    }
-                });
-            </script>
-        <% } else { %>
-            <div class="rating">
-                <% for (let i = 1; i <= 5; i++) { %>
-                    <span><%= i <= Math.round(item.averageRating || 0) ? '★' : '☆' %></span>
+                        </script>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0 fs-5">Reviews</h3>
+        </div>
+        <div class="card-body">
+            <% if (locals.isAuthenticated) { %>
+                <form action="/comment/<%= item._id %>" method="POST" class="mb-4">
+                    <div class="input-group">
+                        <input name="text" placeholder="Write a comment..." required class="form-control">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-chat-fill me-1"></i> Comment
+                        </button>
+                    </div>
+                </form>
+            <% } %>
+
+            <div class="comments">
+                <% if (item.comments && item.comments.length > 0) { %>
+                    <div class="list-group">
+                        <% item.comments.forEach(comment => { %>
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 fw-bold"><%= comment.username %></h6>
+                                    <small class="text-muted">
+                                        <%= comment.date ? comment.date.getFullYear() + '.' +
+                                                String(comment.date.getMonth() + 1).padStart(2, '0') + '.' +
+                                                String(comment.date.getDate()).padStart(2, '0') + '. ' +
+                                                String(comment.date.getHours()).padStart(2, '0') + ':' +
+                                                String(comment.date.getMinutes()).padStart(2, '0')
+                                                : 'No date' %>
+                                    </small>
+                                </div>
+                                <p class="mb-1"><%= comment.text %></p>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i> No comments yet. Be the first to comment!
+                    </div>
                 <% } %>
             </div>
-        <% } %>
-    </div>
-
-    <div class="info-section">
-        <h2><%= item.title %></h2>
-        <p class="creator">
-            <% if (item.author) { %>
-                <strong>Author:</strong> <%= item.author %><br>
-            <% } else if (item.director) { %>
-                <strong>Director:</strong> <%= item.director %><br>
-            <% } %>
-            <strong>Release Year:</strong> <%= item.releaseYear %>
-        </p>
-        <p class="description">
-            <%= item.description %>
-        </p>
-
-        <% if (locals.isAuthenticated) { %>
-            <div class="buttons">
-                <button class="edit-btn"><a href="/edit/<%= item._id %>">Edit</a></button>
-                <button class="remove-btn" onclick="confirmDelete('<%= item._id %>', '<%= item.title %>')">Remove
-                </button>
-
-                <script>
-                    function confirmDelete(itemId, itemTitle) {
-                        if (confirm(`Are you sure you want to remove "${itemTitle}"?`)) {
-                            window.location.href = `/delete/${itemId}`;
-                        }
-                    }
-                </script>
-            </div>
-        <% } %>
-    </div>
-
-    <div class="review-section">
-        <h3>Reviews</h3>
-        <% if (locals.isAuthenticated) { %>
-            <form action="/comment/<%= item._id %>" method="POST">
-                <input name="text" placeholder="Write a comment..." required>
-                <button type="submit" class="comment-btn">Comment</button>
-            </form>
-        <% } %>
-        <div class="comments">
-            <% if (item.comments && item.comments.length > 0) { %>
-                <% item.comments.forEach(comment => { %>
-                    <p><strong><%= comment.username %>:</strong>
-                        <%= comment.text %>
-                        <span class="comment-date">
-                            (<%= comment.date ? comment.date.getFullYear() + '.' +
-                                    String(comment.date.getMonth() + 1).padStart(2, '0') + '.' +
-                                    String(comment.date.getDate()).padStart(2, '0') + '. ' +
-                                    String(comment.date.getHours()).padStart(2, '0') + ':' +
-                                    String(comment.date.getMinutes()).padStart(2, '0')
-                                    : 'No date' %>)
-                        </span></p>
-                <% }); %>
-            <% } else { %>
-                <p>No comments yet. Be the first to comment!</p>
-            <% } %>
         </div>
-        <button type="button" class="back-btn"><a href="/">Back</a></button>
+        <div class="card-footer">
+            <a href="/" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
     </div>
 </main>
 

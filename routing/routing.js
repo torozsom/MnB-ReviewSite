@@ -39,25 +39,25 @@ function subscribeToRoutes(app) {
 
     app.get('/', loadMoviesMW(objRepo), renderMW(objRepo, 'index', {
         title: 'Home Page',
-        stylesheet: '/styles.css',
+        stylesheet: '/custom.css',
         showNav: true
     }));
 
     app.get('/movies', loadMoviesMW(objRepo), renderMW(objRepo, 'index', {
         title: 'Home Page',
-        stylesheet: '/styles.css',
+        stylesheet: '/custom.css',
         showNav: true
     }));
 
     app.get('/books', loadBooksMW(objRepo), renderMW(objRepo, 'index', {
         title: 'Home Page',
-        stylesheet: '/styles.css',
+        stylesheet: '/custom.css',
         showNav: true
     }));
 
     app.get('/register', renderMW(objRepo, 'register', {
         title: 'Register',
-        stylesheet: '/auth.css',
+        stylesheet: '/custom.css',
         showNav: false
     }));
 
@@ -65,7 +65,7 @@ function subscribeToRoutes(app) {
 
     app.get('/login', renderMW(objRepo, 'login', {
         title: 'Login',
-        stylesheet: '/auth.css',
+        stylesheet: '/custom.css',
         showNav: false
     }));
 
@@ -75,7 +75,7 @@ function subscribeToRoutes(app) {
 
     app.get('/add', authMW(objRepo), renderMW(objRepo, 'add', {
         title: 'Add Item',
-        stylesheet: '/add.css',
+        stylesheet: '/custom.css',
         showNav: false
     }));
 
@@ -85,13 +85,13 @@ function subscribeToRoutes(app) {
 
     app.get('/details/:id', loadItemMW(objRepo), renderMW(objRepo, 'details', {
         title: 'Details',
-        stylesheet: '/details.css',
+        stylesheet: '/custom.css',
         showNav: false
     }));
 
     app.get('/edit/:id', authMW(objRepo), loadItemMW(objRepo), renderMW(objRepo, 'edit', {
         title: 'Edit Item',
-        stylesheet: '/edit.css',
+        stylesheet: '/custom.css',
         showNav: false
     }));
 

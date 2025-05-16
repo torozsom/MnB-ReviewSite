@@ -1,25 +1,61 @@
 ﻿<%- include('header') %>
 
-<main class="edit-container">
-    <h2>Editing Item</h2>
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h2 class="mb-0 fs-4">
+                        <i class="bi bi-pencil-square me-2"></i>Edit <%= item.author ? 'Book' : 'Movie' %>
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/edit/<%= item._id %>" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Change Cover Picture</label>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                            <div class="form-text">Current image will be kept if no new image is uploaded.</div>
+                        </div>
 
-    <form action="/edit/<%= item._id %>" method="POST" enctype="multipart/form-data">
-        <label class="upload-label">
-            Change Cover Picture
-            <input type="file" name="image" accept="image/*">
-        </label>
+                        <input type="hidden" name="itemType" value="<%= item.author ? 'book' : 'movie' %>">
 
-        <input type="hidden" name="itemType" value="<%= item.author ? 'book' : 'movie' %>">
-        <input type="text" name="title" value="<%= item.title %>" required>
-        <input type="text" name="creator" value="<%= item.author || item.director %>" required>
-        <input type="number" name="year" value="<%= item.releaseYear %>" min="1800" max="2099" required>
-        <textarea name="description" rows="4" required><%= item.description %></textarea>
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="<%= item.title %>"
+                                   required>
+                        </div>
 
-        <div class="button-group">
-            <a href="/" class="cancel-btn">Cancel</a>
-            <button type="submit" class="update-btn">Update</button>
+                        <div class="mb-3">
+                            <label for="creator" class="form-label"><%= item.author ? 'Author' : 'Director' %></label>
+                            <input type="text" class="form-control" id="creator" name="creator"
+                                   value="<%= item.author || item.director %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="year" class="form-label">Release Year</label>
+                            <input type="number" class="form-control" id="year" name="year"
+                                   value="<%= item.releaseYear %>" min="1800" max="2099" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                      required><%= item.description %></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/details/<%= item._id %>" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-x-circle me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save me-1"></i> Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
 </main>
 
 <%- include('footer') %>
