@@ -21,7 +21,7 @@ function MockBookModel(data) {
 
 MockBookModel.findByIdAndUpdate = mockBookModel.findByIdAndUpdate;
 
-const objRepo = { BookModel: MockBookModel };
+const objRepo = {BookModel: MockBookModel};
 
 
 beforeEach(() => {
@@ -259,7 +259,7 @@ describe('saveBook middleware', () => {
                 }
             };
 
-            const res = { redirect: jest.fn() };
+            const res = {redirect: jest.fn()};
             const next = jest.fn();
 
             MockBookModel.findByIdAndUpdate.mockImplementation(() => {

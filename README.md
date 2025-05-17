@@ -34,14 +34,14 @@ enthusiasts to share their opinions and explore new content.
 
 ## 🧠 Technology Stack
 
-| Component       | Technology                 |
-|-----------------|----------------------------|
-| **Backend**     | Node.js, Express.js        |
+| Component       | Technology                       |
+|-----------------|----------------------------------|
+| **Backend**     | Node.js, Express.js              |
 | **Frontend**    | EJS templates, CSS and Bootstrap |
-| **Database**    | MongoDB with Mongoose ODM  |
-| **Auth**        | Express-session            |
-| **File Upload** | Multer                     |
-| **Development** | Nodemon                    |
+| **Database**    | MongoDB with Mongoose ODM        |
+| **Auth**        | Express-session                  |
+| **File Upload** | Multer                           |
+| **Development** | Nodemon                          |
 
 ---
 
