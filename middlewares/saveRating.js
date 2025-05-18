@@ -115,7 +115,7 @@ module.exports = (objRepo) => {
                     return item.save();
                 })
                 .then(() => {
-                    console.log('✅ Rating saved successfully');
+                    console.log('✅  Rating saved successfully');
                     res.redirect('/details/' + itemId);
                 })
                 .catch(err => {
