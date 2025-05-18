@@ -1,11 +1,13 @@
-﻿body {
+﻿/* Styles for the add item page */
+
+/* Base styles */
+body {
     font-family: Arial, sans-serif;
     background-color: #aaaaaa;
     margin: 0;
     padding: 0;
     text-align: center;
 }
-
 
 header {
     background-color: #222;
@@ -14,28 +16,33 @@ header {
     font-size: 24px;
 }
 
-
 a {
     color: white;
     text-decoration: none;
 }
 
+/* Container styles */
 .add-container {
     max-width: 600px;
     margin: 40px auto;
     background: white;
     padding: 25px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: left;
 }
-
 
 h2 {
     font-size: 22px;
     text-align: center;
 }
 
+/* Form element styles */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
 
 .type-selection {
     display: flex;
@@ -52,12 +59,11 @@ h2 {
     gap: 5px;
 }
 
-
 .upload-label {
     display: block;
     background: #ddd;
     padding: 12px;
-    border-radius: 5px;
+    border-radius: 8px;
     border: 1px solid black;
     cursor: pointer;
     text-align: center;
@@ -69,36 +75,26 @@ h2 {
     display: none;
 }
 
-
 input[type="text"], input[type="number"], textarea {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
     box-sizing: border-box;
 }
-
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
 
 textarea {
     resize: none;
 }
 
-
+/* Button styles */
 .button-group {
     display: flex;
     justify-content: space-between;
     gap: 10px;
 }
-
 
 .cancel-btn, .save-btn {
     flex: 1;
@@ -106,19 +102,17 @@ textarea {
     text-align: center;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     color: white;
     text-decoration: none;
 }
 
 .cancel-btn {
     background-color: #e74c3c;
-    color: white;
 }
 
 .save-btn {
     background-color: #2ecc71;
-    color: white;
 }
 
 .cancel-btn:hover, .save-btn:hover {

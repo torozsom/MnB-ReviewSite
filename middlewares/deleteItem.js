@@ -1,8 +1,9 @@
 ﻿/**
- * Deletes a book or movie from the database.
+ * Middleware for deleting books or movies from the database.
+ * Handles validation, deletion of the item, and cleanup of associated comments.
  *
- * @param objRepo
- * @returns {function(*, *, *): *}
+ * @param objRepo - Object repository containing models
+ * @returns {function(*, *, *): *} - Express middleware function
  */
 module.exports = (objRepo) => {
     const BookModel = objRepo.BookModel;

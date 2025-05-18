@@ -1,6 +1,7 @@
 ﻿<%- include('header') %>
 
 <main class="container py-4">
+    <!-- Search results header -->
     <% if (locals.query && locals.query.search) { %>
         <div class="alert alert-info mb-4">
             <div class="d-flex justify-content-between align-items-center">
@@ -10,12 +11,15 @@
         </div>
     <% } %>
 
+    <!-- Item grid layout -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         <% if (locals.items && items.length > 0) { %>
+            <!-- Display items when available -->
             <% items.forEach(item => { %>
                 <div class="col">
                     <div class="card h-100 shadow-sm hover-card">
                         <a href="/details/<%= item._id %>" class="text-decoration-none">
+                            <!-- Item image -->
                             <div class="card-img-top">
                                 <% if (item.image && item.image.data) { %>
                                     <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
@@ -24,6 +28,7 @@
                                     <img src="/placeholder.png" alt="<%= item.title %>">
                                 <% } %>
                             </div>
+                            <!-- Item title -->
                             <div class="card-body">
                                 <h5 class="card-title text-center text-dark"><%= item.title %></h5>
                             </div>
@@ -32,6 +37,7 @@
                 </div>
             <% }); %>
         <% } else { %>
+            <!-- No items found message -->
             <div class="col-12 text-center py-5">
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle me-2"></i> No items found.

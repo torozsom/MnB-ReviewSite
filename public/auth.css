@@ -1,3 +1,6 @@
+/* Styles for authentication pages (login/register) */
+
+/* Base styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #aaa;
@@ -6,7 +9,6 @@ body {
     text-align: center;
 }
 
-
 header {
     background-color: #222;
     color: white;
@@ -14,41 +16,39 @@ header {
     font-size: 24px;
 }
 
-
+/* Form container styles */
 .form-container {
     max-width: 400px;
     margin: 40px auto;
     background: white;
     padding: 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: left;
 }
-
 
 h2 {
     text-align: center;
     margin-bottom: 20px;
 }
 
-
+/* Form element styles */
 input {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
     box-sizing: border-box;
 }
 
-
+/* Button styles */
 .button-group {
     display: flex;
     justify-content: space-between;
     gap: 10px;
 }
-
 
 .green-btn, .red-btn {
     flex: 1;
@@ -56,22 +56,20 @@ input {
     text-align: center;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     color: white;
     text-decoration: none;
 }
-
 
 .green-btn {
     background-color: #2ecc71;
 }
 
-
 .red-btn {
     background-color: #e74c3c;
 }
 
-
+/* Alternative link styles */
 .alt-link {
     text-align: center;
     margin-top: 15px;

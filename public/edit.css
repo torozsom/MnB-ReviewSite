@@ -1,4 +1,7 @@
-﻿body {
+﻿/* Styles for the edit page */
+
+/* Base styles */
+body {
     font-family: Arial, sans-serif;
     background-color: #aaaaaa;
     margin: 0;
@@ -6,7 +9,7 @@
     text-align: center;
 }
 
-
+/* Header styles */
 header {
     background-color: #222;
     color: white;
@@ -14,29 +17,34 @@ header {
     font-size: 24px;
 }
 
-
+/* Container styles */
 .edit-container {
     max-width: 600px;
     margin: 40px auto;
     background: white;
     padding: 25px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: left;
 }
-
 
 h2 {
     font-size: 22px;
     text-align: center;
 }
 
+/* Form element styles */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
 
 .upload-label {
     display: block;
     background: #ddd;
     padding: 12px;
-    border-radius: 5px;
+    border-radius: 8px;
     border: 1px solid black;
     cursor: pointer;
     text-align: center;
@@ -44,35 +52,25 @@ h2 {
     margin-bottom: 15px;
 }
 
-
 .upload-label input {
     display: none;
 }
-
 
 input[type="text"], input[type="number"], textarea {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
     box-sizing: border-box;
 }
-
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
 
 textarea {
     resize: none;
 }
 
-
+/* Button styles */
 .button-group {
     display: flex;
     justify-content: space-between;
@@ -80,18 +78,16 @@ textarea {
     gap: 10px;
 }
 
-
 .cancel-btn, .update-btn {
     padding: 10px 15px;
     text-align: center;
     font-size: 16px;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px;
     width: 48%;
     text-decoration: none;
 }
-
 
 .cancel-btn {
     background-color: #e74c3c;
@@ -103,12 +99,10 @@ textarea {
     color: white;
 }
 
-
 .update-btn {
     background-color: #2ecc71;
     color: white;
 }
-
 
 .cancel-btn:hover, .update-btn:hover {
     opacity: 0.8;
