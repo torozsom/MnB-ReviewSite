@@ -3,8 +3,12 @@
 # =====================================================
 
 
-# Middleware Documentation
 
+# Middleware Documentation
+# ========================
+
+
+# Content Loading Middlewares
 
 # loadBooksMW: Loads all books from the database.
 # Used for listing books on the homepage.
@@ -18,51 +22,86 @@ MIDDLEWARE loadMoviesMW
 # If the item is found, it passes data to the next middleware.
 MIDDLEWARE loadItemMW
 
-# saveItemMW: Saves a new book or movie to the database.
-# Only accessible by authenticated users.
-MIDDLEWARE saveItemMW
 
-# deleteItemMW: Deletes a book or movie from the database.
-# Redirects the user to the homepage after deletion.
-MIDDLEWARE deleteItemMW
-
-# renderMW: Renders an HTML page using the appropriate template.
-MIDDLEWARE renderMW
+# Authentication Middlewares
 
 # authMW: Checks if the user is authenticated.
 # If the user is not logged in, redirects to /login.
 MIDDLEWARE authMW
 
-# logoutMW: Logs out the user by destroying the session.
-MIDDLEWARE logoutMW
-
 # loginMW: Handles user login by verifying credentials.
 MIDDLEWARE loginMW
 
-# saveReviewMW: Saves a comment of an item from a user to the database.
-MIDDLEWARE saveReviewMW
+# registerMW: Handles user registration by creating a new user account.
+MIDDLEWARE registerMW
+
+# logoutMW: Logs out the user by destroying the session.
+MIDDLEWARE logoutMW
+
+
+# Rendering Middleware
+
+# renderMW: Renders an HTML page using the appropriate template.
+# Accepts template name and rendering options.
+MIDDLEWARE renderMW
+
+
+# Data Manipulation Middlewares
+
+# saveBookMW: Saves a new book or updates an existing book in the database.
+# Only accessible by authenticated users.
+MIDDLEWARE saveBookMW
+
+# saveMovieMW: Saves a new movie or updates an existing movie in the database.
+# Only accessible by authenticated users.
+MIDDLEWARE saveMovieMW
+
+# deleteItemMW: Deletes a book or movie from the database.
+# Redirects the user to the homepage after deletion.
+MIDDLEWARE deleteItemMW
+
+# saveCommentMW: Saves a comment on an item from a user to the database.
+MIDDLEWARE saveCommentMW
+
+# saveRatingMW: Saves a rating for an item from a user to the database.
+MIDDLEWARE saveRatingMW
+
+
+# File Upload Handling
+
+# multer: Middleware for handling multipart/form-data (file uploads)
+# Configured to store images in memory before saving to database
+# Limits file size to 5MB and only accepts image files
+MIDDLEWARE multer
+
 
 
 # Routing Configuration
+# =====================
 
+
+# Home and Listing Routes
 
 # Home Page - Lists all movies
-GET     /                 loadMoviesMW  renderMW(index.html)
+GET     /                 loadMoviesMW  renderMW(index)
 
 # Movies page - Lists all movies
-GET     /movies           loadMoviesMW  renderMW(index.html)
+GET     /movies           loadMoviesMW  renderMW(index)
 
 # Books page - Lists all books
-GET     /books            loadBooksMW  renderMW(index.html)
+GET     /books            loadBooksMW  renderMW(index)
+
+
+# Authentication Routes
 
 # Login Page - Displays login form
-GET     /login            renderMW(login.html)
+GET     /login            renderMW(login)
 
 # Login Submission - Processes login request
 POST    /login            loginMW
 
 # Register Page - Displays registration form
-GET     /register         renderMW(register.html)
+GET     /register         renderMW(register)
 
 # Register Submission - Processes registration request
 POST    /register         registerMW
@@ -70,20 +109,35 @@ POST    /register         registerMW
 # Logout - Ends user session
 GET     /logout           logoutMW
 
+
+# Item Management Routes
+
 # View Item Details
-GET     /details/:id      loadItemMW renderMW(details.html)
+GET     /details/:id      loadItemMW renderMW(details)
 
 # Add a New Item (Requires Authentication)
-GET     /add              authMW renderMW(add.html)
-POST    /add              authMW saveItemMW
+GET     /add              authMW renderMW(add)
+POST    /add              authMW upload.single('image') saveBookMW saveMovieMW
 
 # Edit an Existing Item (Requires Authentication)
-GET     /edit/:id         authMW loadItemMW renderMW(edit.html)
-POST    /edit/:id         authMW loadItemMW saveItemMW
+GET     /edit/:id         authMW loadItemMW renderMW(edit)
+POST    /edit/:id         authMW upload.single('image') saveBookMW saveMovieMW
 
 # Delete an Item (Requires Authentication)
-DELETE  /delete/:id       authMW deleteItemMW
+GET     /delete/:id       authMW deleteItemMW
 
-# Review Submission
-POST    /reviews/:id  authMW saveReviewMW
+
+# Interaction Routes
+
+# Comment Submission
+POST    /comment/:id      authMW saveCommentMW
+
+# Rating Submission
+POST    /rate/:id         authMW saveRatingMW
+
+
+# Error Handling
+
+# Global Error Handler
+USE     *                 errorHandlerMW
 
