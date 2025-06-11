@@ -5,6 +5,8 @@
  */
 module.exports = (objRepo) => {
     const UserModel = objRepo.UserModel;
+    const bcrypt = require('bcrypt');
+    const SALT_ROUNDS = 10; // Standard salt rounds for bcrypt
 
 
     /**
@@ -59,8 +61,12 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the saved user
      */
     function createUser(username, email, password) {
-        const newUser = new UserModel({username, email, password});
-        return newUser.save()
+        // Hash the password before storing
+        return bcrypt.hash(password, SALT_ROUNDS)
+            .then(hashedPassword => {
+                const newUser = new UserModel({username, email, password: hashedPassword});
+                return newUser.save();
+            })
             .then(savedUser => {
                 console.log('✅  User registered successfully:', savedUser.username);
                 return savedUser;

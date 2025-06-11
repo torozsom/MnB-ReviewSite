@@ -6,6 +6,7 @@
  */
 module.exports = (objRepo) => {
     const UserModel = objRepo.UserModel;
+    const bcrypt = require('bcrypt');
 
 
     /**
@@ -36,10 +37,14 @@ module.exports = (objRepo) => {
                 if (!user)
                     throw new Error('⚠️  Invalid username or password.');
 
-                if (user.password !== password)
-                    throw new Error('⚠️  Invalid username or password.');
+                // Compare the provided password with the stored hash
+                return bcrypt.compare(password, user.password)
+                    .then(isMatch => {
+                        if (!isMatch)
+                            throw new Error('⚠️  Invalid username or password.');
 
-                return user;
+                        return user;
+                    });
             });
     }
 
