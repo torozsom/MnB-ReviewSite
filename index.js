@@ -1,19 +1,12 @@
 // Import required modules
 const express = require('express');
 const path = require('path');
-const session = require('express-session');
 const app = express();
 
-// Configure middleware
+// Configure middlewares
 app.use(express.urlencoded({extended: true}));
-
-// Configure session
-app.use(session({
-    secret: 'review-site-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {secure: false}
-}));
+const sessionMW = require('./config/session');
+app.use(sessionMW);
 
 // Configure view engine and static files
 app.set("view engine", "ejs");
