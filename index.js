@@ -1,3 +1,8 @@
+/**
+ * Setting up the express web application
+ * and the necessary configurations
+ */
+
 // Import required modules
 const express = require('express');
 const path = require('path');

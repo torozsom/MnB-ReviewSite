@@ -25,19 +25,7 @@ const saveMovieMW = require('../middlewares/saveMovie');
 const saveCommentMW = require('../middlewares/saveComment');
 const saveRatingMW = require('../middlewares/saveRating');
 
-// Configure file upload handling
-const multer = require('multer');
-const storage = multer.memoryStorage(); // Store in memory before saving to DB
-const upload = multer({
-    storage: storage,
-    limits: {fileSize: 5 * 1024 * 1024}, // 5MB limit
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/'))
-            cb(null, true);
-        else
-            cb(new Error('Only images are allowed'), false);
-    }
-});
+const fileUpload = require('../config/upload');
 
 // Load models
 const BookModel = require('../models/book');
@@ -96,7 +84,7 @@ function subscribeToRoutes(app) {
         stylesheet: '/custom.css',
         showNav: false
     }));
-    app.post('/add', authMW(objRepo), upload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
+    app.post('/add', authMW(objRepo), fileUpload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
         res.redirect('/');
     });
 
@@ -111,7 +99,7 @@ function subscribeToRoutes(app) {
         stylesheet: '/custom.css',
         showNav: false
     }));
-    app.post('/edit/:id', authMW(objRepo), upload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
+    app.post('/edit/:id', authMW(objRepo), fileUpload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
         res.redirect('/');
     });
 
