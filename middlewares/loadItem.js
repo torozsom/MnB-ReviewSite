@@ -15,93 +15,82 @@ module.exports = (objRepo) => {
      * @param {Object} res - The response object for attaching the comments.
      * @returns {Promise<void>} Resolves when the operation is complete or logs an error if it fails.
      */
-    function loadComments(itemId, modelType, res) {
-        return objRepo.CommentModel.find({
-            _assignedTo: itemId,
-            onModel: modelType
-        })
-            .sort({date: -1}) // Sort by date descending (newest first)
-            .then(comments => {
+    async function loadComments(itemId, modelType, res) {
+        try {
+            const comments = await objRepo.CommentModel.find({
+                _assignedTo: itemId,
+                onModel: modelType
+            }).sort({date: -1});
+            if (comments)
                 res.locals.item.comments = comments;
-            })
-            .catch(err => {
-                console.error('Error loading comments:', err);
-                res.locals.item.comments = [];
-            });
+        } catch (err) {
+            console.error('Error loading comments:', err);
+            res.locals.item.comments = [];
+        }
     }
 
 
     /**
-     * Loads a user's rating for a specific item from the database and attaches it to `res.locals.userRating`.
+     * Loads the user rating for a specific item and sets it in the response's local variables.
      *
-     * @param {string} itemId - The ID of the item (e.g., book or movie) to which the rating is assigned.
-     * @param {string} modelType - The type of the model (`Book` or `Movie`) to search the rating for.
-     * @param {string|null} username - The username of the user whose rating is being retrieved.
-     * @param {Object} res - The response object for attaching the user's rating.
-     * @returns {Promise<void>} Resolves when the operation is complete or logs an error if it fails.
+     * @param {string} itemId - The unique identifier of the item for which the rating is being loaded.
+     * @param {string} modelType - The type of the model associated with the item.
+     * @param {string} username - The username of the user whose rating is being retrieved.
+     * @param {object} res - The response object where the loaded user rating will be set in the `locals` property.
+     * @return {Promise<void>} A promise that resolves when the rating has been loaded and the response's locals are updated.
      */
-    function loadUserRating(itemId, modelType, username, res) {
+    async function loadUserRating(itemId, modelType, username, res) {
         if (!username) {
-            res.locals.userRating = null;
+            res.locals.userRatings = [];
             return Promise.resolve();
         }
 
-        return objRepo.RatingModel.findOne({
-            _assignedTo: itemId,
-            onModel: modelType,
-            username: username
-        })
-            .then(rating => {
+        try {
+            const rating = await objRepo.RatingModel.findOne({
+                _assignedTo: itemId,
+                onModel: modelType,
+                username: username
+                }
+            );
+            if (rating)
                 res.locals.userRating = rating ? rating.rating : null;
-            })
-            .catch(err => {
-                console.error('Error loading user rating:', err);
-                res.locals.userRating = null;
-            });
+        } catch (err) {
+            console.error('Error loading user rating:', err);
+            res.locals.userRating = null;
+        }
     }
 
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const itemId = req.params.id;
         const username = req.session.username;
 
         if (!itemId)
             return res.status(400).send('⚠️  Item ID is required.');
 
-        // First try to find the item as a book
-        objRepo.BookModel.findById(itemId)
-            .then(book => {
-                if (book) {
-                    // Item is a book
-                    res.locals.item = book;
-                    return Promise.all([
-                        loadComments(itemId, 'Book', res),
-                        loadUserRating(itemId, 'Book', username, res)
-                    ]);
-                } else {
-                    // Try to find the item as a movie
-                    return objRepo.MovieModel.findById(itemId)
-                        .then(movie => {
-                            if (movie) {
-                                // Item is a movie
-                                res.locals.item = movie;
-                                return Promise.all([
-                                    loadComments(itemId, 'Movie', res),
-                                    loadUserRating(itemId, 'Movie', username, res)
-                                ]);
-                            } else {
-                                return res.status(404).send('⚠️  Item not found.');
-                            }
-                        });
-                }
-            })
-            .then(() => {
+        try {
+            let item = await objRepo.BookModel.findById(itemId);
+            if (item) {
+                res.locals.item = item;
+                await loadComments(itemId, 'Book', res);
+                await loadUserRating(itemId, 'Book', username, res);
                 return next();
-            })
-            .catch(err => {
-                console.error('Error loading item:', err);
-                next(err);
-            });
+            } else {
+                item = await objRepo.MovieModel.findById(itemId);
+                if (item) {
+                    res.locals.item = item;
+                    await loadComments(itemId, 'Movie', res);
+                    await loadUserRating(itemId, 'Movie', username, res);
+                    return next();
+                } else {
+                    return res.status(404).send('⚠️  Item not found.');
+                }
+            }
+        } catch (err) {
+            console.error('Error loading item:', err);
+            next(err);
+        }
+
     };
 
 }

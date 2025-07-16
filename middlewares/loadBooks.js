@@ -7,7 +7,7 @@
  */
 module.exports = (objRepo) => {
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const searchQuery = req.query.search;
         let query = {};
 
@@ -24,16 +24,18 @@ module.exports = (objRepo) => {
             };
         }
 
-        objRepo.BookModel.find(query)
-            .then(books => {
+        try {
+            const books = await objRepo.BookModel.find(query);
+            if (books) {
                 res.locals.items = books;
                 return next();
-            })
-            .catch(err => {
-                console.error('Error loading books:', err);
-                res.locals.items = [];
-                return next();
-            });
+            }
+        } catch (err) {
+            console.error('Error loading books:', err);
+            res.locals.items = [];
+            return next();
+        }
+
     };
 
 }

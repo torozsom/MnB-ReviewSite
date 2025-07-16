@@ -22,63 +22,73 @@ module.exports = (objRepo) => {
 
 
     /**
-     * Deletes a book by ID
+     * Deletes a book from the database based on the provided item ID.
      *
-     * @param itemId - ID of the book to delete
-     * @returns {Promise<*>} - Promise resolving to the deleted book or null if not found
+     * @param {string} itemId - The unique identifier of the book to be deleted.
+     * @return {Promise<{item: Object, modelType: string} | null>}
+     *          A promise that resolves to an object
+     *          containing the deleted book's data and its model type if successful,
+     *          or null if no book was found with the given ID.
      */
-    function deleteBook(itemId) {
-        return objRepo.BookModel.findByIdAndDelete(itemId)
-            .then(deletedBook => {
-                if (deletedBook) {
-                    console.log('✅  Book deleted successfully:', deletedBook.title);
-                    return {item: deletedBook, modelType: 'Book'};
-                }
-                return null;
-            });
+    async function deleteBook(itemId) {
+        try {
+            const deletedBook = await objRepo.BookModel.findByIdAndDelete(itemId);
+            if (deletedBook) {
+                console.log('✅  Book deleted successfully:', deletedBook.title);
+                return {item: deletedBook, modelType: 'Book'};
+            }
+            return null;
+        } catch (err) {
+            console.error('Error deleting book:', err);
+        }
     }
 
 
     /**
-     * Deletes a movie by ID
+     * Deletes a movie from the database by its unique identifier.
      *
-     * @param itemId - ID of the movie to delete
-     * @returns {Promise<*>} - Promise resolving to the deleted movie or null if not found
+     * @param {string} itemId - The unique identifier of the movie to be deleted.
+     *
+     * @return {Promise<Object|null>} A promise that resolves to an object
+     *          containing the deleted movie and model type if successful,
+     *          or null if no movie is found with the given identifier.
      */
-    function deleteMovie(itemId) {
-        return objRepo.MovieModel.findByIdAndDelete(itemId)
-            .then(deletedMovie => {
-                if (deletedMovie) {
-                    console.log('✅  Movie deleted successfully:', deletedMovie.title);
-                    return {item: deletedMovie, modelType: 'Movie'};
-                }
-                return null;
-            });
+    async function deleteMovie(itemId) {
+        try {
+            const deletedMovie = await objRepo.MovieModel.findByIdAndDelete(itemId);
+            if (deletedMovie) {
+                console.log('✅  Movie deleted successfully:', deletedMovie.title);
+                return {item: deletedMovie, modelType: 'Movie'};
+            }
+            return null;
+        } catch (err) {
+            console.error('Error deleting movie:', err);
+        }
     }
 
 
     /**
-     * Deletes comments associated with an item
+     * Deletes all comments associated with a specific item and model type.
      *
-     * @param itemId - ID of the item
-     * @param modelType - Type of the model ('Book' or 'Movie')
-     * @returns {Promise<*>} - Promise resolving when comments are deleted
+     * @param {string} itemId - The identifier of the item whose comments are to be deleted.
+     * @param {string} modelType - The type of the model to which the item belongs.
+     * @return {Promise<void>} A promise that resolves when the deletion process is complete.
      */
-    function deleteComments(itemId, modelType) {
-        return objRepo.CommentModel.deleteMany({
-            _assignedTo: itemId,
-            onModel: modelType
-        })
-            .then(result => {
-                console.log(`✅  Deleted ${result.deletedCount} comments associated with the item.`);
-            })
-            .catch(err => {
-                console.error('Error deleting comments:', err);
+    async function deleteComments(itemId, modelType) {
+        try {
+            const deletedComments = await objRepo.CommentModel.deleteMany({
+                assignedTo: itemId,
+                onModel: modelType
             });
+            if (deletedComments)
+                console.log(`✅  Deleted ${deletedComments.deletedCount} comments associated with the item.`)
+        } catch (err) {
+            console.error('Error deleting comments:', err);
+        }
     }
 
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const itemId = req.params.id;
 
         // Validate item ID
@@ -86,30 +96,26 @@ module.exports = (objRepo) => {
         if (validationError)
             return res.status(400).send(validationError);
 
-        // Try to delete the item as a book first, then as a movie if not found
-        deleteBook(itemId)
-            .then(result => {
-                if (result) {
-                    return deleteComments(itemId, result.modelType);
-                } else {
-                    // Try to find and delete the item as a movie
-                    return deleteMovie(itemId)
-                        .then(result => {
-                            if (result)
-                                return deleteComments(itemId, result.modelType);
-                            else
-                                return res.status(404).send('⚠️  Item not found.');
-                        });
-                }
-            })
-            .then(() => {
-                // Redirect to home page after successful deletion
-                res.redirect('/');
-            })
-            .catch(err => {
-                console.error('Error deleting item:', err);
-                next(err);
-            });
+        try {
+            let deletedItem = await deleteBook(itemId);
+
+            if (deletedItem)
+                await deleteComments(itemId, deletedItem.modelType);
+            else {
+                deletedItem = await deleteMovie(itemId);
+                if (deletedItem)
+                    await deleteComments(itemId, deletedItem.modelType);
+                else
+                    return res.status(404).send('⚠️  Item not found.');
+            }
+
+            res.redirect('/');
+
+        } catch (err) {
+            console.error('Error deleting item:', err);
+            next(err);
+        }
+
     };
 
 }

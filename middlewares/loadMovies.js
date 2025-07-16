@@ -7,7 +7,7 @@
  */
 module.exports = (objRepo) => {
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const searchQuery = req.query.search;
         let query = {};
 
@@ -24,16 +24,18 @@ module.exports = (objRepo) => {
             };
         }
 
-        objRepo.MovieModel.find(query)
-            .then(movies => {
+        try {
+            const movies = await objRepo.MovieModel.find(query);
+            if (movies) {
                 res.locals.items = movies;
                 return next();
-            })
-            .catch(err => {
-                console.error('Error loading movies:', err);
-                res.locals.items = [];
-                return next();
-            });
+            }
+        } catch (err) {
+            console.error('Error loading movies:', err);
+            res.locals.items = [];
+            return next();
+        }
+
     };
 
 }

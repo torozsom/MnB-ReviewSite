@@ -30,21 +30,16 @@ module.exports = (objRepo) => {
      * @param password - Password to verify
      * @returns {Promise<*>} - Promise resolving to the authenticated user
      */
-    function authenticateUser(username, password) {
-        return objRepo.UserModel.findOne({username})
-            .then(user => {
-                if (!user)
-                    throw new Error('⚠️  Invalid username or password.');
+    async function authenticateUser(username, password) {
+        const user = await objRepo.UserModel.findOne({username});
+        if (!user)
+            throw new Error('⚠️  Invalid username or password.');
 
-                // Compare the provided password with the stored hash
-                return bcrypt.compare(password, user.password)
-                    .then(isMatch => {
-                        if (!isMatch)
-                            throw new Error('⚠️  Invalid username or password.');
+        const match = await bcrypt.compare(password, user.password);
+        if (!match)
+            throw new Error('⚠️  Invalid username or password.')
 
-                        return user;
-                    });
-            });
+        return user;
     }
 
 
@@ -64,7 +59,7 @@ module.exports = (objRepo) => {
     }
 
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const username = req.body.username;
         const password = req.body.password;
 
@@ -74,14 +69,16 @@ module.exports = (objRepo) => {
             return res.status(400).send(validationError);
 
         // Authenticate user
-        authenticateUser(username, password)
-            .then(user => setupUserSession(req, user))
-            .then(() => res.redirect('/'))
-            .catch(err => {
-                if (err.message.startsWith('⚠️'))
-                    return res.status(400).send(err.message);
-                next(err);
-            });
+        try {
+            const user = await authenticateUser(username, password);
+            if (user)
+                setupUserSession(req, user);
+            res.redirect('/');
+        } catch (err) {
+            console.error('Error authenticating user:', err);
+            next(err);
+        }
+
     };
 
 }
