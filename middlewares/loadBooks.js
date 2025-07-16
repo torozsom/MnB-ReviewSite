@@ -6,7 +6,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const BookModel = objRepo.BookModel;
 
     return (req, res, next) => {
         const searchQuery = req.query.search;
@@ -25,7 +24,7 @@ module.exports = (objRepo) => {
             };
         }
 
-        BookModel.find(query)
+        objRepo.BookModel.find(query)
             .then(books => {
                 res.locals.items = books;
                 return next();

@@ -5,8 +5,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const BookModel = objRepo.BookModel;
-
 
     /**
      * Validates book data from the request
@@ -52,7 +50,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the updated book
      */
     function updateExistingBook(bookId, updateData) {
-        return BookModel.findByIdAndUpdate(
+        return objRepo.BookModel.findByIdAndUpdate(
             bookId,
             updateData,
             {new: true}
@@ -74,7 +72,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the saved book
      */
     function createNewBook(bookData) {
-        const newBook = new BookModel(bookData);
+        const newBook = new objRepo.BookModel(bookData);
         return newBook.save()
             .then(savedBook => {
                 console.log('✅  Book saved successfully:', savedBook.title);

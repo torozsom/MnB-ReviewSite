@@ -4,8 +4,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const UserModel = objRepo.UserModel;
-
 
     /**
      * Validates registration data
@@ -42,7 +40,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<void>} - Promise that resolves if no existing user is found
      */
     function checkExistingUser(username, email) {
-        return UserModel.findOne({$or: [{username}, {email}]})
+        return objRepo.UserModel.findOne({$or: [{username}, {email}]})
             .then(existingUser => {
                 if (existingUser)
                     throw new Error('⚠️  Username or email already taken.');
@@ -59,7 +57,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the saved user
      */
     function createUser(username, email, password) {
-        const newUser = new UserModel({username, email, password});
+        const newUser = new objRepo.UserModel({username, email, password});
         return newUser.save()
             .then(savedUser => {
                 console.log('✅  User registered successfully:', savedUser.username);

@@ -5,10 +5,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const CommentModel = objRepo.CommentModel;
-    const BookModel = objRepo.BookModel;
-    const MovieModel = objRepo.MovieModel;
-
 
     /**
      * Validates comment data
@@ -34,13 +30,13 @@ module.exports = (objRepo) => {
      */
     function findItem(itemId) {
         // First try to find the item as a book
-        return BookModel.findById(itemId)
+        return objRepo.BookModel.findById(itemId)
             .then(book => {
                 if (book) {
                     return {item: book, modelType: 'Book'};
                 } else {
                     // Try to find the item as a movie
-                    return MovieModel.findById(itemId)
+                    return objRepo.MovieModel.findById(itemId)
                         .then(movie => {
                             if (movie)
                                 return {item: movie, modelType: 'Movie'};
@@ -63,7 +59,7 @@ module.exports = (objRepo) => {
      */
     function saveComment(username, text, itemId, modelType) {
         // Create new comment
-        const newComment = new CommentModel({
+        const newComment = new objRepo.CommentModel({
             username,
             text,
             date: new Date(),

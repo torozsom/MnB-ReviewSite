@@ -5,7 +5,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const UserModel = objRepo.UserModel;
     const bcrypt = require('bcrypt');
 
 
@@ -32,7 +31,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the authenticated user
      */
     function authenticateUser(username, password) {
-        return UserModel.findOne({username})
+        return objRepo.UserModel.findOne({username})
             .then(user => {
                 if (!user)
                     throw new Error('⚠️  Invalid username or password.');
@@ -76,10 +75,8 @@ module.exports = (objRepo) => {
 
         // Authenticate user
         authenticateUser(username, password)
-            .then(user => {
-                setupUserSession(req, user);
-                res.redirect('/');
-            })
+            .then(user => setupUserSession(req, user))
+            .then(() => res.redirect('/'))
             .catch(err => {
                 if (err.message.startsWith('⚠️'))
                     return res.status(400).send(err.message);

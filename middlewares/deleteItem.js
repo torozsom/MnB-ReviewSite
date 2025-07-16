@@ -6,10 +6,6 @@
  * @returns {function(*, *, *): *} - Express middleware function
  */
 module.exports = (objRepo) => {
-    const BookModel = objRepo.BookModel;
-    const MovieModel = objRepo.MovieModel;
-    const CommentModel = objRepo.CommentModel;
-
 
     /**
      * Validates that the item ID is provided
@@ -32,7 +28,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the deleted book or null if not found
      */
     function deleteBook(itemId) {
-        return BookModel.findByIdAndDelete(itemId)
+        return objRepo.BookModel.findByIdAndDelete(itemId)
             .then(deletedBook => {
                 if (deletedBook) {
                     console.log('✅  Book deleted successfully:', deletedBook.title);
@@ -50,7 +46,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the deleted movie or null if not found
      */
     function deleteMovie(itemId) {
-        return MovieModel.findByIdAndDelete(itemId)
+        return objRepo.MovieModel.findByIdAndDelete(itemId)
             .then(deletedMovie => {
                 if (deletedMovie) {
                     console.log('✅  Movie deleted successfully:', deletedMovie.title);
@@ -69,7 +65,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving when comments are deleted
      */
     function deleteComments(itemId, modelType) {
-        return CommentModel.deleteMany({
+        return objRepo.CommentModel.deleteMany({
             _assignedTo: itemId,
             onModel: modelType
         })

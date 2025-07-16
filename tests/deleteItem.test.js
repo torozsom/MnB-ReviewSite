@@ -78,7 +78,7 @@ describe('deleteItem middleware', () => {
     describe('deleteBook function', () => {
         const middleware = deleteItemMiddleware(objRepo);
 
-        test('should delete a book and its comments successfully', async () => {
+        test('should delete a book and its comments successfully', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -102,18 +102,18 @@ describe('deleteItem middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(mockCommentModel.deleteMany).toHaveBeenCalledWith({
-                _assignedTo: '123456789012',
-                onModel: 'Book'
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(mockCommentModel.deleteMany).toHaveBeenCalledWith({
+                    _assignedTo: '123456789012',
+                    onModel: 'Book'
+                });
+                expect(res.redirect).toHaveBeenCalledWith('/');
             });
-            expect(res.redirect).toHaveBeenCalledWith('/');
         });
 
 
-        test('should handle book not found and try to delete as movie', async () => {
+        test('should handle book not found and try to delete as movie', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -141,19 +141,19 @@ describe('deleteItem middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(mockMovieModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(mockCommentModel.deleteMany).toHaveBeenCalledWith({
-                _assignedTo: '123456789012',
-                onModel: 'Movie'
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(mockMovieModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(mockCommentModel.deleteMany).toHaveBeenCalledWith({
+                    _assignedTo: '123456789012',
+                    onModel: 'Movie'
+                });
+                expect(res.redirect).toHaveBeenCalledWith('/');
             });
-            expect(res.redirect).toHaveBeenCalledWith('/');
         });
 
 
-        test('should handle error when deleting a book', async () => {
+        test('should handle error when deleting a book', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -168,10 +168,10 @@ describe('deleteItem middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(next).toHaveBeenCalledWith(error);
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(next).toHaveBeenCalledWith(error);
+            });
         });
     });
 
@@ -179,7 +179,7 @@ describe('deleteItem middleware', () => {
     describe('deleteMovie function', () => {
         const middleware = deleteItemMiddleware(objRepo);
 
-        test('should handle error when deleting a movie', async () => {
+        test('should handle error when deleting a movie', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -196,15 +196,15 @@ describe('deleteItem middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(mockMovieModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(next).toHaveBeenCalledWith(error);
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(mockMovieModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(next).toHaveBeenCalledWith(error);
+            });
         });
 
 
-        test('should handle item not found (neither book nor movie)', async () => {
+        test('should handle item not found (neither book nor movie)', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -224,12 +224,12 @@ describe('deleteItem middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(mockMovieModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.send).toHaveBeenCalledWith(expect.stringContaining('Item not found'));
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(mockMovieModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(res.status).toHaveBeenCalledWith(404);
+                expect(res.send).toHaveBeenCalledWith(expect.stringContaining('Item not found'));
+            });
         });
     });
 
@@ -237,7 +237,7 @@ describe('deleteItem middleware', () => {
     describe('deleteComments function', () => {
         const middleware = deleteItemMiddleware(objRepo);
 
-        test('should handle error when deleting comments', async () => {
+        test('should handle error when deleting comments', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -260,15 +260,15 @@ describe('deleteItem middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
+                expect(mockCommentModel.deleteMany).toHaveBeenCalledWith({
+                    _assignedTo: '123456789012',
+                    onModel: 'Book'
+                });
 
-            expect(mockBookModel.findByIdAndDelete).toHaveBeenCalledWith('123456789012');
-            expect(mockCommentModel.deleteMany).toHaveBeenCalledWith({
-                _assignedTo: '123456789012',
-                onModel: 'Book'
+                expect(res.redirect).toHaveBeenCalledWith('/');
             });
-
-            expect(res.redirect).toHaveBeenCalledWith('/');
         });
     });
 

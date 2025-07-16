@@ -5,8 +5,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const MovieModel = objRepo.MovieModel;
-
 
     /**
      * Validates movie data from the request
@@ -52,7 +50,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the updated movie
      */
     function updateExistingMovie(movieId, updateData) {
-        return MovieModel.findByIdAndUpdate(
+        return objRepo.MovieModel.findByIdAndUpdate(
             movieId,
             updateData,
             {new: true}
@@ -74,7 +72,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<*>} - Promise resolving to the saved movie
      */
     function createNewMovie(movieData) {
-        const newMovie = new MovieModel(movieData);
+        const newMovie = new objRepo.MovieModel(movieData);
         return newMovie.save()
             .then(savedMovie => {
                 console.log('✅  Movie saved successfully:', savedMovie.title);

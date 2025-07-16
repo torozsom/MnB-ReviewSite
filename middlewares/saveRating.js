@@ -5,7 +5,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const RatingModel = objRepo.RatingModel;
 
     return (req, res, next) => {
         const username = req.session.username;
@@ -22,18 +21,14 @@ module.exports = (objRepo) => {
         if (rating < 1 || rating > 5)
             return res.status(400).send('⚠️  Rating must be between 1 and 5.');
 
-        // Determine if the item is a book or movie
-        const BookModel = objRepo.BookModel;
-        const MovieModel = objRepo.MovieModel;
-
         // First try to find the item as a book
-        BookModel.findById(itemId)
+        objRepo.BookModel.findById(itemId)
             .then(book => {
                 if (book) {
                     return saveRating('Book', itemId, book);
                 } else {
                     // Try to find the item as a movie
-                    return MovieModel.findById(itemId)
+                    return objRepo.MovieModel.findById(itemId)
                         .then(movie => {
                             if (movie)
                                 return saveRating('Movie', itemId, movie);
@@ -61,7 +56,7 @@ module.exports = (objRepo) => {
          */
         function saveRating(modelType, itemId, item) {
             // Check if user has already rated this item
-            return RatingModel.findOne({
+            return objRepo.RatingModel.findOne({
                 _assignedTo: itemId,
                 onModel: modelType,
                 username: username
@@ -74,7 +69,7 @@ module.exports = (objRepo) => {
                         return existingRating.save().then(() => updateAverageRating(modelType, itemId, item));
                     } else {
                         // Create new rating
-                        const newRating = new RatingModel({
+                        const newRating = new objRepo.RatingModel({
                             username,
                             rating,
                             date: new Date(),
@@ -99,7 +94,7 @@ module.exports = (objRepo) => {
          * @returns {Promise} - Resolves when the item's average rating is updated and saved.
          */
         function updateAverageRating(modelType, itemId, item) {
-            return RatingModel.find({
+            return objRepo.RatingModel.find({
                 _assignedTo: itemId,
                 onModel: modelType
             })

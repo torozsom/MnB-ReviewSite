@@ -182,7 +182,7 @@ describe('saveBook middleware', () => {
     describe('createNewBook function', () => {
         const middleware = saveBookMiddleware(objRepo);
 
-        test('should create a new book and redirect', async () => {
+        test('should create a new book and redirect', () => {
             const req = {
                 params: {},
                 body: {
@@ -205,14 +205,14 @@ describe('saveBook middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.prototype.save).toHaveBeenCalled();
-            expect(res.redirect).toHaveBeenCalledWith('/books');
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.prototype.save).toHaveBeenCalled();
+                expect(res.redirect).toHaveBeenCalledWith('/books');
+            });
         });
 
 
-        test('should handle errors when creating a book', async () => {
+        test('should handle errors when creating a book', () => {
             const req = {
                 params: {},
                 body: {
@@ -234,10 +234,10 @@ describe('saveBook middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(mockBookModel.prototype.save).toHaveBeenCalled();
-            expect(next).toHaveBeenCalledWith(error);
+            return new Promise(process.nextTick).then(() => {
+                expect(mockBookModel.prototype.save).toHaveBeenCalled();
+                expect(next).toHaveBeenCalledWith(error);
+            });
         });
     });
 
@@ -245,7 +245,7 @@ describe('saveBook middleware', () => {
     describe('updateExistingBook function', () => {
         const middleware = saveBookMiddleware(objRepo);
 
-        test('should update an existing book and redirect', async () => {
+        test('should update an existing book and redirect', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -270,23 +270,23 @@ describe('saveBook middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalledWith(
-                '123456789012',
-                expect.objectContaining({
-                    title: 'Updated Book',
-                    author: 'Updated Author',
-                    releaseYear: 2021,
-                    description: 'Updated description'
-                }),
-                {new: true}
-            );
-            expect(res.redirect).toHaveBeenCalledWith('/books');
+            return new Promise(process.nextTick).then(() => {
+                expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalledWith(
+                    '123456789012',
+                    expect.objectContaining({
+                        title: 'Updated Book',
+                        author: 'Updated Author',
+                        releaseYear: 2021,
+                        description: 'Updated description'
+                    }),
+                    {new: true}
+                );
+                expect(res.redirect).toHaveBeenCalledWith('/books');
+            });
         });
 
 
-        test('should handle book not found error', async () => {
+        test('should handle book not found error', () => {
             const req = {
                 params: {
                     id: 'nonexistent'
@@ -313,15 +313,15 @@ describe('saveBook middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalled();
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.send).toHaveBeenCalledWith(expect.stringContaining('Book not found'));
+            return new Promise(process.nextTick).then(() => {
+                expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalled();
+                expect(res.status).toHaveBeenCalledWith(404);
+                expect(res.send).toHaveBeenCalledWith(expect.stringContaining('Book not found'));
+            });
         });
 
 
-        test('should handle errors when updating a book', async () => {
+        test('should handle errors when updating a book', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -344,14 +344,14 @@ describe('saveBook middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalled();
-            expect(next).toHaveBeenCalledWith(error);
+            return new Promise(process.nextTick).then(() => {
+                expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalled();
+                expect(next).toHaveBeenCalledWith(error);
+            });
         });
 
 
-        test('should update a book with a new image', async () => {
+        test('should update a book with a new image', () => {
             const req = {
                 params: {
                     id: '123456789012'
@@ -379,23 +379,23 @@ describe('saveBook middleware', () => {
 
             middleware(req, res, next);
 
-            await new Promise(process.nextTick);
-
-            expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalledWith(
-                '123456789012',
-                expect.objectContaining({
-                    title: 'Updated Book with Image',
-                    author: 'Updated Author',
-                    releaseYear: 2021,
-                    description: 'Updated description',
-                    image: expect.objectContaining({
-                        data: expect.any(Buffer),
-                        contentType: 'image/jpeg'
-                    })
-                }),
-                {new: true}
-            );
-            expect(res.redirect).toHaveBeenCalledWith('/books');
+            return new Promise(process.nextTick).then(() => {
+                expect(MockBookModel.findByIdAndUpdate).toHaveBeenCalledWith(
+                    '123456789012',
+                    expect.objectContaining({
+                        title: 'Updated Book with Image',
+                        author: 'Updated Author',
+                        releaseYear: 2021,
+                        description: 'Updated description',
+                        image: expect.objectContaining({
+                            data: expect.any(Buffer),
+                            contentType: 'image/jpeg'
+                        })
+                    }),
+                    {new: true}
+                );
+                expect(res.redirect).toHaveBeenCalledWith('/books');
+            });
         });
     });
 

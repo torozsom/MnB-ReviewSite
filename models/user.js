@@ -10,17 +10,16 @@ const userSchema = new Schema({
     password: String
 })
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', function(next) {
     if (!this.isModified('password'))
         return next();
 
-    try {
-        const SALT_ROUNDS = 10;
-        this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
-        next();
-    } catch (err) {
-        next(err);
-    }
+    bcrypt.hash(this.password, 10)
+        .then(hashedPassword => {
+            this.password = hashedPassword;
+            next();
+        })
+        .catch(next);
 });
 
 const User = db.model('User', userSchema);

@@ -5,11 +5,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const BookModel = objRepo.BookModel;
-    const MovieModel = objRepo.MovieModel;
-    const CommentModel = objRepo.CommentModel;
-    const RatingModel = objRepo.RatingModel;
-
 
     /**
      * Loads comments associated with a specific item from the database, sorts them by date in descending order,
@@ -21,7 +16,7 @@ module.exports = (objRepo) => {
      * @returns {Promise<void>} Resolves when the operation is complete or logs an error if it fails.
      */
     function loadComments(itemId, modelType, res) {
-        return CommentModel.find({
+        return objRepo.CommentModel.find({
             _assignedTo: itemId,
             onModel: modelType
         })
@@ -51,7 +46,7 @@ module.exports = (objRepo) => {
             return Promise.resolve();
         }
 
-        return RatingModel.findOne({
+        return objRepo.RatingModel.findOne({
             _assignedTo: itemId,
             onModel: modelType,
             username: username
@@ -74,7 +69,7 @@ module.exports = (objRepo) => {
             return res.status(400).send('⚠️  Item ID is required.');
 
         // First try to find the item as a book
-        BookModel.findById(itemId)
+        objRepo.BookModel.findById(itemId)
             .then(book => {
                 if (book) {
                     // Item is a book
@@ -85,7 +80,7 @@ module.exports = (objRepo) => {
                     ]);
                 } else {
                     // Try to find the item as a movie
-                    return MovieModel.findById(itemId)
+                    return objRepo.MovieModel.findById(itemId)
                         .then(movie => {
                             if (movie) {
                                 // Item is a movie

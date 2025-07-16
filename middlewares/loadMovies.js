@@ -6,7 +6,6 @@
  * @returns {function(*, *, *): *}
  */
 module.exports = (objRepo) => {
-    const MovieModel = objRepo.MovieModel;
 
     return (req, res, next) => {
         const searchQuery = req.query.search;
@@ -25,7 +24,7 @@ module.exports = (objRepo) => {
             };
         }
 
-        MovieModel.find(query)
+        objRepo.MovieModel.find(query)
             .then(movies => {
                 res.locals.items = movies;
                 return next();
