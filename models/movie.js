@@ -1,14 +1,32 @@
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 
-const Movie = db.model('Movie', new Schema({
-    title: String,
+const movieSchema = new Schema({
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 200
+    },
 
-    director: String,
+    director: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 100
+    },
 
     releaseYear: Number,
 
-    description: String,
+    description: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 1000
+    },
 
     image: {
         data: Buffer,
@@ -24,6 +42,11 @@ const Movie = db.model('Movie', new Schema({
         type: Number,
         default: 0
     }
-}));
+});
+
+movieSchema.index({ title: 1 });
+movieSchema.index({ director: 1 });
+
+const Movie = db.model('Movie', movieSchema);
 
 module.exports = Movie;

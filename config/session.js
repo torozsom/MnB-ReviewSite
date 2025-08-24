@@ -5,7 +5,12 @@
 
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-require('dotenv').config();
+
+const rawTtl = Number(process.env.SESSION_DURATION);
+if (Number.isNaN(rawTtl))
+    console.warn('SESSION_DURATION is not a valid number, defaulting to 3600 seconds');
+
+const ttl = Number.isNaN(rawTtl) ? 3600 : rawTtl;
 
 const sessionConfig = session({
     secret: process.env.SESSION_SECRET,
@@ -13,14 +18,14 @@ const sessionConfig = session({
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
-        ttl: process.env.SESSION_DURATION,
+        ttl: ttl,
         autoRemove: 'native'
     }),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         sameSite: 'lax',
-        maxAge: process.env.SESSION_DURATION * 1000
+        maxAge: ttl * 1000
     }
 });
 

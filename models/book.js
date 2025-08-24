@@ -1,14 +1,32 @@
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 
-const Book = db.model('Book', new Schema({
-    title: String,
+const bookSchema = new Schema({
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 200
+    },
 
-    author: String,
+    author: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 100
+    },
 
     releaseYear: Number,
 
-    description: String,
+    description: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 1000
+    },
 
     image: {
         data: Buffer,
@@ -24,6 +42,11 @@ const Book = db.model('Book', new Schema({
         type: Number,
         default: 0
     }
-}));
+});
+
+bookSchema.index({ title: 1 });
+bookSchema.index({ author: 1 });
+
+const Book = db.model('Book', bookSchema);
 
 module.exports = Book;

@@ -1,16 +1,32 @@
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 
-const Comment = db.model('Comment', new Schema({
-    username: String,
+const commentSchema = new Schema({
+    username: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 100
+    },
 
-    text: String,
+    text: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 1000
+    },
 
-    date: Date,
+    date: {
+        type: Date,
+        default: Date.now
+    },
 
     _assignedTo: {
         type: Schema.Types.ObjectId,
-        refPath: 'onModel'
+        refPath: 'onModel',
+        required: true
     },
 
     onModel: {
@@ -18,6 +34,8 @@ const Comment = db.model('Comment', new Schema({
         required: true,
         enum: ['Movie', 'Book']
     }
-}));
+});
+
+const Comment = db.model('Comment', commentSchema);
 
 module.exports = Comment;

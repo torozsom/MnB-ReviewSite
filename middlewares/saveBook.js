@@ -49,19 +49,18 @@ module.exports = (objRepo) => {
      * @param updateData - Data to update
      * @returns {Promise<*>} - Promise resolving to the updated book
      */
-    function updateExistingBook(bookId, updateData) {
-        return objRepo.BookModel.findByIdAndUpdate(
-            bookId,
-            updateData,
-            {new: true}
-        )
-            .then(updatedBook => {
-                if (!updatedBook)
-                    throw new Error('⚠️  Book not found.');
-
-                console.log('✅  Book updated successfully:', updatedBook.title);
-                return updatedBook;
-            });
+    async function updateExistingBook(bookId, updateData) {
+        try {
+            const book = await objRepo.BookModel.findByIdAndUpdate(
+                bookId,
+                updateData,
+                {new: true}
+            );
+            console.log('✅  Book updated successfully:', book.title);
+            return book;
+        } catch (error) {
+            console.error('Error updating book:', error);
+        }
     }
 
 
@@ -71,17 +70,21 @@ module.exports = (objRepo) => {
      * @param bookData - Data for the new book
      * @returns {Promise<*>} - Promise resolving to the saved book
      */
-    function createNewBook(bookData) {
+    async function createNewBook(bookData) {
         const newBook = new objRepo.BookModel(bookData);
-        return newBook.save()
-            .then(savedBook => {
+        try {
+            const savedBook = await newBook.save();
+            if (savedBook) {
                 console.log('✅  Book saved successfully:', savedBook.title);
                 return savedBook;
-            });
+            }
+        } catch (error) {
+            console.error('Error saving book:', error);
+        }
     }
 
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         // Check if we're adding a new book or editing an existing one
         const isEdit = req.params.id !== undefined;
 

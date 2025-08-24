@@ -5,6 +5,7 @@
 
 // Load middleware modules
 // Content loading middleware
+const loadItemsMW = require('../middlewares/loadItems');
 const loadBooksMW = require('../middlewares/loadBooks.js');
 const loadMoviesMW = require('../middlewares/loadMovies');
 const loadItemMW = require('../middlewares/loadItem');
@@ -43,7 +44,7 @@ const objRepo = {BookModel, MovieModel, CommentModel, UserModel, RatingModel};
  */
 function subscribeToRoutes(app) {
     // Home and listing routes
-    app.get('/', loadMoviesMW(objRepo), renderMW(objRepo, 'index', {
+    app.get('/', loadItemsMW(objRepo.MovieModel, ['title', 'director']), renderMW(objRepo, 'index', {
         title: 'Home Page',
         stylesheet: '/custom.css',
         showNav: true

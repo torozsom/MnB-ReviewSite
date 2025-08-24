@@ -3,12 +3,28 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
 const userSchema = new Schema({
-    username: String,
+    username: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 3,
+        maxlength: 50
+    },
 
-    email: String,
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        lowercase: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    },
 
-    password: String
-})
+    password: {
+        type: String,
+        required: true,
+        minlength: 6
+    }
+});
 
 userSchema.pre('save', function(next) {
     if (!this.isModified('password'))

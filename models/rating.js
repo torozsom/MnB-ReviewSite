@@ -1,8 +1,14 @@
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 
-const Rating = db.model('Rating', new Schema({
-    username: String,
+const ratingSchema = new Schema({
+    username: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 100
+    },
 
     rating: {
         type: Number,
@@ -11,11 +17,15 @@ const Rating = db.model('Rating', new Schema({
         required: true
     },
 
-    date: Date,
+    date: {
+        type: Date,
+        default: Date.now
+    },
 
     _assignedTo: {
         type: Schema.Types.ObjectId,
-        refPath: 'onModel'
+        refPath: 'onModel',
+        required: true
     },
 
     onModel: {
@@ -23,6 +33,8 @@ const Rating = db.model('Rating', new Schema({
         required: true,
         enum: ['Movie', 'Book']
     }
-}));
+});
+
+const Rating = db.model('Rating', ratingSchema);
 
 module.exports = Rating;

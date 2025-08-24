@@ -8,6 +8,8 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+require('dotenv').config();
+
 // Configure middlewares
 app.use(express.urlencoded({extended: true}));
 const sessionMW = require('./config/session');
@@ -23,7 +25,7 @@ const subscribeToRoutes = require('./routing/routing');
 subscribeToRoutes(app);
 
 // Start the server
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log('Server is running on http://localhost:' + port);
 });

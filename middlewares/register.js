@@ -39,12 +39,15 @@ module.exports = (objRepo) => {
      * @param email - Email to check
      * @returns {Promise<void>} - Promise that resolves if no existing user is found
      */
-    function checkExistingUser(username, email) {
-        return objRepo.UserModel.findOne({$or: [{username}, {email}]})
-            .then(existingUser => {
-                if (existingUser)
-                    throw new Error('⚠️  Username or email already taken.');
-            });
+    async function checkExistingUser(username, email) {
+        try {
+            const user = await objRepo.UserModel.findOne({$or: [{username}, {email}]});
+            if (user)
+                throw new Error('⚠️  Username or email already taken.');
+            return user;
+        } catch (err) {
+            console.error('Error checking existing user:', err);
+        }
     }
 
 
@@ -56,18 +59,22 @@ module.exports = (objRepo) => {
      * @param password - Password for the new user
      * @returns {Promise<*>} - Promise resolving to the saved user
      */
-    function createUser(username, email, password) {
+    async function createUser(username, email, password) {
         const newUser = new objRepo.UserModel({username, email, password});
-        return newUser.save()
-            .then(savedUser => {
+
+        try {
+            const savedUser = await newUser.save();
+            if (savedUser) {
                 console.log('✅  User registered successfully:', savedUser.username);
                 return savedUser;
-            })
-            .catch(err => console.error('Error registering user:', err));
+            }
+        } catch (err) {
+            console.error('Error registering user:', err);
+        }
     }
 
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         const username = req.body.username;
         const email = req.body.email;
         const password = req.body.password;
@@ -78,19 +85,20 @@ module.exports = (objRepo) => {
         if (validationError)
             return res.status(400).send(validationError);
 
-        // Check for existing user and create new user if none exists
-        checkExistingUser(username, email)
-            .then(() => createUser(username, email, password))
-            .then(() => {
-                // Add success message to session
-                req.session.successMessage = '✅ Registration successful! You can now log in.';
-                res.redirect('/');
-            })
-            .catch(err => {
-                if (err.message.startsWith('⚠️'))
-                    return res.status(400).send(err.message);
-                next(err);
-            });
+        try {
+            const userExists = await checkExistingUser(username, email);
+            if (userExists) {
+                const newUser = await createUser(username, email, password);
+                if (newUser) {
+                    req.session.successMessage = '✅ Registration successful! You can now log in.';
+                    res.redirect('/');
+                }
+            }
+        } catch (err) {
+            if (err.message.startsWith('⚠️'))
+                return res.status(400).send(err.message);
+            next(err);
+        }
     };
 
 }
