@@ -15,7 +15,7 @@ module.exports = (model, fields) => {
 
         if (searchQuery && Array.isArray(fields) && fields.length > 0) {
             query = {
-                $or: fields.map(field => ({ [field]: { $regex: searchQuery, $options: 'i' } }))
+                $or: fields.map(field => ({[field]: {$regex: searchQuery, $options: 'i'}}))
             };
         }
 

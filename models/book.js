@@ -44,8 +44,8 @@ const bookSchema = new Schema({
     }
 });
 
-bookSchema.index({ title: 1 });
-bookSchema.index({ author: 1 });
+bookSchema.index({title: 1});
+bookSchema.index({author: 1});
 
 const Book = db.model('Book', bookSchema);
 

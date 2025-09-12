@@ -44,8 +44,8 @@ const movieSchema = new Schema({
     }
 });
 
-movieSchema.index({ title: 1 });
-movieSchema.index({ director: 1 });
+movieSchema.index({title: 1});
+movieSchema.index({director: 1});
 
 const Movie = db.model('Movie', movieSchema);
 

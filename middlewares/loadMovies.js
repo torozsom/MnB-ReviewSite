@@ -1,5 +1,4 @@
-﻿
-// Wrapper around generic item loader for movies.
+﻿// Wrapper around generic item loader for movies.
 const loadItems = require('./loadItems');
 
 
