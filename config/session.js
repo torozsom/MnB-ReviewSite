@@ -6,7 +6,15 @@
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
+if (!process.env.SESSION_SECRET) {
+    console.error('SESSION_SECRET environment variable is not set');
+    process.exit(1);
+}
+
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost/MnB-ReviewSite';
+
 const rawTtl = Number(process.env.SESSION_DURATION);
+
 if (Number.isNaN(rawTtl))
     console.warn('SESSION_DURATION is not a valid number, defaulting to 3600 seconds');
 
@@ -17,7 +25,7 @@ const sessionConfig = session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: process.env.MONGO_URI,
+        mongoUrl: mongoUri,
         ttl: ttl,
         autoRemove: 'native'
     }),
