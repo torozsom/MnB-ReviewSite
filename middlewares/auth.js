@@ -8,9 +8,18 @@
  */
 module.exports = (objRepo) => {
     return (req, res, next) => {
-        if (req.session?.isAuthenticated)
+        if (req.session?.isAuthenticated && req.session.userId) {
+            res.locals.user = {
+                id: req.session.userId,
+                username: req.session.username,
+                email: req.session.email
+            }
             return next();
-        else
-            return res.redirect('/login');
+        }
+
+        if (req.xhr || req.headers.accept.indexOf('json') > -1)
+            return res.status(401).json({error: 'Unauthorized'});
+
+        return res.redirect('/login');
     };
 }
