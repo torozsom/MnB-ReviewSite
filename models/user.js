@@ -1,6 +1,13 @@
+/**
+ * This schema represents users in our application. Each user has a username, email, and password.
+ * We also use a pre-save hook to hash the password before saving the user document to the database.
+ * We also index the 'username' field to ensure uniqueness and optimize queries by username.
+ */
+
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
+
 
 const userSchema = new Schema({
     username: {
@@ -26,6 +33,7 @@ const userSchema = new Schema({
     }
 });
 
+// Pre-save hook to hash the password before saving the user document
 userSchema.pre('save', function (next) {
     if (!this.isModified('password'))
         return next();
@@ -37,6 +45,9 @@ userSchema.pre('save', function (next) {
         })
         .catch(next);
 });
+
+// Index to ensure uniqueness of username and optimize queries by username
+userSchema.index({username: 1}, {unique: true});
 
 const User = db.model('User', userSchema);
 

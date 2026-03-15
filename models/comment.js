@@ -1,13 +1,19 @@
+/**
+ * This schema represents comments made by users on movies or books. Each comment is associated
+ * with a user and either a movie or a book. The 'refPath' allows us to reference different models
+ * (Movie or Book) based on the value of 'onModel'. We also index the '_assignedTo' field along with
+ * 'createdAt' to optimize queries that retrieve comments for a specific movie or book, sorted by creation date.
+ */
+
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 
+
 const commentSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 1,
-        maxlength: 100
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
 
     text: {
@@ -16,11 +22,6 @@ const commentSchema = new Schema({
         trim: true,
         minlength: 1,
         maxlength: 1000
-    },
-
-    date: {
-        type: Date,
-        default: Date.now
     },
 
     _assignedTo: {
@@ -34,7 +35,11 @@ const commentSchema = new Schema({
         required: true,
         enum: ['Movie', 'Book']
     }
-});
+}, {timestamps: true});
+
+
+// Index to optimize queries for comments related to a specific movie or book, sorted by creation date
+commentSchema.index({_assignedTo: 1, createdAt: -1});
 
 const Comment = db.model('Comment', commentSchema);
 

@@ -1,5 +1,13 @@
+/**
+ * This schema represents books in our application. Each book has a title,
+ * author, release year, description, image URL, average rating, and rating count.
+ * We also index the 'title' and 'author' fields to optimize search queries based on
+ * these attributes.
+ */
+
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
+
 
 const bookSchema = new Schema({
     title: {
@@ -18,7 +26,11 @@ const bookSchema = new Schema({
         maxlength: 100
     },
 
-    releaseYear: Number,
+    releaseYear: {
+        type: Number,
+        min: [1800, 'Book must be published after 1800'],
+        max: [new Date().getFullYear(), 'Book cannot be published from the future']
+    },
 
     description: {
         type: String,
@@ -28,24 +40,28 @@ const bookSchema = new Schema({
         maxlength: 1000
     },
 
-    image: {
-        data: Buffer,
-        contentType: String
+    imageUrl: {
+        type: String,
+        default: '/placeholder.png'
     },
 
     averageRating: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0,
+        max: 5
     },
 
     ratingCount: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0
     }
-});
+}, {timestamps: true});
 
-bookSchema.index({title: 1});
-bookSchema.index({author: 1});
+
+// Index to optimize search queries based on title and author
+bookSchema.index({title: 1, author: 1});
 
 const Book = db.model('Book', bookSchema);
 

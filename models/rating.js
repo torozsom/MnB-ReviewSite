@@ -1,13 +1,19 @@
+/**
+ * This schema represents ratings given by users to movies or books. Each rating is associated with
+ * a user and either a movie or a book. The 'refPath' allows us to reference different models
+ * (Movie or Book) based on the value of 'onModel'. We also index the 'user' and '_assignedTo' fields
+ * to optimize queries that retrieve ratings for a specific movie or book by a specific user.
+ */
+
 const Schema = require('mongoose').Schema;
 const db = require('../config/db');
 
+
 const ratingSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 1,
-        maxlength: 100
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
 
     rating: {
@@ -15,11 +21,6 @@ const ratingSchema = new Schema({
         min: 1,
         max: 5,
         required: true
-    },
-
-    date: {
-        type: Date,
-        default: Date.now
     },
 
     _assignedTo: {
@@ -33,7 +34,11 @@ const ratingSchema = new Schema({
         required: true,
         enum: ['Movie', 'Book']
     }
-});
+}, {timestamps: true});
+
+
+// Index to optimize queries for ratings related to a specific movie or book, sorted by creation date
+ratingSchema.index({user: 1, _assignedTo: 1});
 
 const Rating = db.model('Rating', ratingSchema);
 
