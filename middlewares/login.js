@@ -24,64 +24,67 @@ module.exports = (objRepo) => {
 
 
     /**
-     * Authenticates a user by username and password
+     * Sets up the user session after successful authentication
      *
-     * @param username - Username to authenticate
-     * @param password - Password to verify
-     * @returns {Promise<*>} - Promise resolving to the authenticated user
+     * @param req - Request object
+     * @param res - Response object
+     * @param next - Next middleware function
+     * @param user - Authenticated user
      */
-    function authenticateUser(username, password) {
-        return objRepo.UserModel.findOne({username})
-            .then(user => {
-                if (!user)
-                    throw new Error('⚠️  Invalid username or password.');
+    function setupUserSession(req, res, next, user) {
+        req.session.regenerate(err => {
+            if (err) return next(err);
 
-                // Compare the provided password with the stored hash
-                return bcrypt.compare(password, user.password)
-                    .then(isMatch => {
-                        if (!isMatch)
-                            throw new Error('⚠️  Invalid username or password.');
+            req.session.userId = user._id;
+            req.session.username = user.username;
+            req.session.email = user.email;
+            req.session.isAuthenticated = true;
 
-                        return user;
-                    });
-            });
+            console.log('✅  User logged in successfully:', user.username);
+
+            req.session.save(err => {
+                if (err) return next(err);
+                return res.redirect('/');
+            })
+        });
     }
 
 
     /**
-     * Sets up the user session after successful authentication
+     * Authenticates a user by username and password
      *
-     * @param req - Request object
-     * @param user - Authenticated user
+     * @param res - Response object
+     * @param next - Next middleware function
+     * @param username - Username to authenticate
+     * @param password - Password to verify
      */
-    function setupUserSession(req, user) {
-        req.session.userId = user._id;
-        req.session.username = user.username;
-        req.session.email = user.email;
-        req.session.isAuthenticated = true;
+    function authenticateUser(res, next, username, password) {
+        objRepo.UserModel.findOne({username})
+            .then(user => {
+                if (!user)
+                    return res.status(401).send('⚠️  Invalid username or password.');
 
-        console.log('✅  User logged in successfully:', user.username);
+                return bcrypt.compare(password, user.password)
+                    .then(isMatch => {
+                        if (!isMatch)
+                            return res.status(401).send('⚠️  Invalid username or password.');
+                        setupUserSession(res.req, res, next, user);
+                    })
+            })
+            .catch(err => {
+                console.error('Error during login process:', err);
+                return next(err);
+            });
     }
 
 
     return (req, res, next) => {
-        const username = req.body.username;
-        const password = req.body.password;
+        const {username, password} = req.body;
 
-        // Validate login credentials
         const validationError = validateLoginCredentials(username, password);
         if (validationError)
             return res.status(400).send(validationError);
 
-        // Authenticate user
-        authenticateUser(username, password)
-            .then(user => setupUserSession(req, user))
-            .then(() => res.redirect('/'))
-            .catch(err => {
-                if (err.message.startsWith('⚠️'))
-                    return res.status(400).send(err.message);
-                next(err);
-            });
+        authenticateUser(res, next, username, password);
     };
-
 }
