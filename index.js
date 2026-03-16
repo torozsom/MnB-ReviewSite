@@ -3,15 +3,20 @@
  * and the necessary configurations
  */
 
+require('dotenv').config();
+
 // Import required modules
 const express = require('express');
 const path = require('path');
 const app = express();
 
-require('dotenv').config();
+if (process.env.NODE_ENV === 'production')
+    app.set('trust proxy', 1);
 
 // Configure middlewares
 app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
 const sessionMW = require('./config/session');
 app.use(sessionMW);
 

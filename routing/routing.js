@@ -85,9 +85,7 @@ function subscribeToRoutes(app) {
         stylesheet: '/custom.css',
         showNav: false
     }));
-    app.post('/add', authMW(objRepo), fileUpload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
-        res.redirect('/');
-    });
+    app.post('/add', authMW(objRepo), fileUpload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo));
 
     app.get('/details/:id', loadItemMW(objRepo), renderMW(objRepo, 'details', {
         title: 'Details',
@@ -100,9 +98,7 @@ function subscribeToRoutes(app) {
         stylesheet: '/custom.css',
         showNav: false
     }));
-    app.post('/edit/:id', authMW(objRepo), fileUpload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo), (req, res) => {
-        res.redirect('/');
-    });
+    app.post('/edit/:id', authMW(objRepo), fileUpload.single('image'), saveBookMW(objRepo), saveMovieMW(objRepo));
 
     app.get('/delete/:id', authMW(objRepo), deleteItemMW(objRepo));
 
@@ -117,8 +113,20 @@ function subscribeToRoutes(app) {
 
     // Error handling
     app.use((err, req, res, next) => {
-        console.log('Error:', err);
-        res.end('An error occurred');
+        // Logoljuk a hibát a szerver konzolján (fejlesztőknek)
+        console.error('Serverside error: ', err);
+
+        // If a response has already been sent, delegate to the default Express error handler
+        if (res.headersSent)
+            return next(err);
+
+        // Set status: 500 (Internal Server Error)
+        res.status(500);
+
+        if (req.xhr || req.headers.accept.indexOf('json') > -1)
+            return res.json({ error: 'Valami hiba történt a szerveren.' });
+        else
+            return res.send('<h2>500 - Internal Server Error</h2><p>Something has gone wrong, try again later.</p>');
     });
 }
 
