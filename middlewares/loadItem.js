@@ -20,7 +20,7 @@ module.exports = (objRepo) => {
             _assignedTo: itemId,
             onModel: modelType
         })
-            .sort({ date: -1 })
+            .sort({ createdAt: -1 })
             .populate('user', 'username')
             .then(comments => {
                 res.locals.item.comments = comments;

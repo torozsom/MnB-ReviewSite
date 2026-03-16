@@ -40,9 +40,9 @@ module.exports = (objRepo) => {
         objRepo.BookModel.findByIdAndUpdate(req.params.id, updateData, { new: true })
             .then(book => {
                 if (!book)
-                    return res.status(404).send('⚠️ The book was not found.');
+                    return res.status(404).send('The book was not found.');
                 console.log('Book updated successfully:', book.title);
-                return res.redirect('/');
+                return res.redirect('/details/' + book._id);
             })
             .catch(err => {
                 console.error('Error updating book:', err);

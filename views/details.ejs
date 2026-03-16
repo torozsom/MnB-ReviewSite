@@ -6,8 +6,8 @@
             <div class="row g-0">
                 <!-- Image Section -->
                 <div class="col-md-4 p-4 text-center border-end">
-                    <% if (item.image && item.image.data) { %>
-                        <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
+                    <% if (item.imageUrl) { %>
+                        <img src="<%= item.imageUrl %>"
                              alt="<%= item.title %>" class="img-fluid rounded shadow-sm">
                     <% } else { %>
                         <img src="/placeholder.png" alt="<%= item.title %>" class="img-fluid rounded shadow-sm">
@@ -149,13 +149,13 @@
                         <% item.comments.forEach(comment => { %>
                             <div class="list-group-item list-group-item-action">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1 fw-bold"><%= comment.username %></h6>
+                                    <h6 class="mb-1 fw-bold"><%= comment.user ? comment.user.username : 'Unknown User' %></h6>
                                     <small class="text-muted">
-                                        <%= comment.date ? comment.date.getFullYear() + '.' +
-                                                String(comment.date.getMonth() + 1).padStart(2, '0') + '.' +
-                                                String(comment.date.getDate()).padStart(2, '0') + '. ' +
-                                                String(comment.date.getHours()).padStart(2, '0') + ':' +
-                                                String(comment.date.getMinutes()).padStart(2, '0')
+                                        <%= comment.createdAt ? comment.createdAt.getFullYear() + '.' +
+                                                String(comment.createdAt.getMonth() + 1).padStart(2, '0') + '.' +
+                                                String(comment.createdAt.getDate()).padStart(2, '0') + '. ' +
+                                                String(comment.createdAt.getHours()).padStart(2, '0') + ':' +
+                                                String(comment.createdAt.getMinutes()).padStart(2, '0')
                                                 : 'No date' %>
                                     </small>
                                 </div>

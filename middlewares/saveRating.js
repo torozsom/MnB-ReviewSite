@@ -8,25 +8,24 @@ module.exports = (objRepo) => {
 
     /**
      * Finds an item by ID and determines its model type (Book or Movie).
-     * If the item is found, returns it; otherwise, returns null.
+     * If the item is found, returns an object with item and modelType; otherwise, returns null.
      *
      * @param itemId
-     * @param modelType
-     * @returns {Promise<*>} Promise resolving to the found item or null if not found
+     * @returns {Promise<{item: *, modelType: string}|null>} Promise resolving to the found item info or null
      */
-    function findItem(itemId, modelType) {
+    function findItem(itemId) {
         return objRepo.BookModel.findById(itemId)
             .then(book => {
-                if (book) {
-                    modelType = 'Book';
-                    return book;
-                }
+                if (book)
+                    return { item: book, modelType: 'Book' };
+
                 return objRepo.MovieModel.findById(itemId)
                     .then(movie => {
-                        if (movie) modelType = 'Movie';
-                        return movie;
+                        if (movie)
+                            return { item: movie, modelType: 'Movie' };
+                        return null;
                     });
-            })
+            });
     }
 
 
@@ -90,11 +89,13 @@ module.exports = (objRepo) => {
         let modelType = null;
         let foundItem = null;
 
-        findItem(itemId, modelType)
-            .then(item => {
-                if (!item)
+        findItem(itemId)
+            .then(result => {
+                if (!result)
                     return res.status(404).send('Item not found.');
-                foundItem = item;
+                
+                foundItem = result.item;
+                modelType = result.modelType;
 
                 // Check if a rating from this user already exists for this item
                 return objRepo.RatingModel.findOne({

@@ -21,8 +21,8 @@
                         <a href="/details/<%= item._id %>" class="text-decoration-none">
                             <!-- Item image -->
                             <div class="card-img-top">
-                                <% if (item.image && item.image.data) { %>
-                                    <img src="data:<%= item.image.contentType %>;base64,<%= item.image.data.toString('base64') %>"
+                                <% if (item.imageUrl) { %>
+                                    <img src="<%= item.imageUrl %>"
                                          alt="<%= item.title %>">
                                 <% } else { %>
                                     <img src="/placeholder.png" alt="<%= item.title %>">
