@@ -18,49 +18,35 @@ module.exports = (objRepo) => {
     function validateMovieData(title, director, releaseYear, description) {
         // Validate required fields
         if (!title || !director || !releaseYear || !description)
-            return '⚠️  All fields are required.';
+            return 'All fields are required.';
 
         // Validate release year
-        if (isNaN(releaseYear) || releaseYear < 1800 || releaseYear > new Date().getFullYear())
-            return '⚠️  Invalid release year.';
+        if (isNaN(releaseYear) || releaseYear < 1900 || releaseYear > new Date().getFullYear())
+            return 'Invalid release year.';
 
         return null;
     }
 
 
     /**
-     * Processes image data from the request
-     *
-     * @param req - Request object
-     * @returns {object|undefined} - Image data object or undefined
-     */
-    function processImageData(req) {
-        return req.file ? {
-            data: req.file.buffer,
-            contentType: req.file.mimetype
-        } : undefined;
-    }
-
-
-    /**
      * Updates an existing movie in the database
      *
-     * @param movieId - ID of the movie to update
-     * @param updateData - Data to update
-     * @returns {Promise<*>} - Promise resolving to the updated movie
+     * @param req The request object
+     * @param res The response object
+     * @param next The next middleware function
+     * @param updateData The data to update the movie with
      */
-    function updateExistingMovie(movieId, updateData) {
-        return objRepo.MovieModel.findByIdAndUpdate(
-            movieId,
-            updateData,
-            {new: true}
-        )
-            .then(updatedMovie => {
-                if (!updatedMovie)
-                    throw new Error('⚠️  Movie not found.');
-
-                console.log('✅  Movie updated successfully:', updatedMovie.title);
-                return updatedMovie;
+    function updateExistingMovie(req, res, next, updateData) {
+        objRepo.MovieModel.findByIdAndUpdate(req.params.id, updateData, { new: true })
+            .then(movie => {
+                if (!movie)
+                    return res.status(404).send('The movie was not found.');
+                console.log('Movie updated successfully:', movie.title);
+                return res.redirect('/');
+            })
+            .catch(err => {
+                console.error('Error updating movie:', err);
+                return next(err);
             });
     }
 
@@ -68,26 +54,32 @@ module.exports = (objRepo) => {
     /**
      * Creates a new movie in the database
      *
+     * @param res The response object
+     * @param next The next middleware function
      * @param movieData - Data for the new movie
      * @returns {Promise<*>} - Promise resolving to the saved movie
      */
-    function createNewMovie(movieData) {
+    function createNewMovie(res, next, movieData) {
         const newMovie = new objRepo.MovieModel(movieData);
-        return newMovie.save()
+        newMovie.save()
             .then(savedMovie => {
-                console.log('✅  Movie saved successfully:', savedMovie.title);
-                return savedMovie;
+                console.log('Movie saved successfully:', savedMovie.title);
+                return res.redirect('/');
+            })
+            .catch(err => {
+                console.error('Error saving movie:', err);
+                return next(err);
             });
     }
 
 
     return (req, res, next) => {
-        // Check if we're adding a new movie or editing an existing one
-        const isEdit = req.params.id !== undefined;
-
-        // Only process if itemType is 'movie' (for both add and edit forms)
         if (req.body.itemType !== 'movie')
             return next();
+
+        // Validate image file
+        if (req.fileValidationError)
+            return res.status(400).send(req.fileValidationError);
 
         // Extract data from request body
         const title = req.body.title;
@@ -100,54 +92,18 @@ module.exports = (objRepo) => {
         if (validationError)
             return res.status(400).send(validationError);
 
-        // Process image if uploaded
-        const imageData = processImageData(req);
+        // Check if we're adding a new movie or editing an existing one
+        const isEdit = req.params.id !== undefined;
+        const movieData = { title, director, releaseYear, description };
 
-        if (isEdit) {
-            // Create update object
-            const updateData = {
-                title,
-                director,
-                releaseYear,
-                description
-            };
+        // Upload image
+        if (req.file)
+            movieData.imageUrl = '/uploads/' + req.file.filename;
 
-            // Only update image if a new one was uploaded
-            if (imageData)
-                updateData.image = imageData;
-
-            // Update existing movie
-            updateExistingMovie(req.params.id, updateData)
-                .then(() => {
-                    res.redirect('/movies');
-                })
-                .catch(err => {
-                    if (err.message === '⚠️  Movie not found.')
-                        return res.status(404).send(err.message);
-
-                    console.error('Error updating movie:', err);
-                    next(err);
-                });
-        } else {
-            // Create new movie data object
-            const movieData = {
-                title,
-                director,
-                releaseYear,
-                description,
-                image: imageData
-            };
-
-            // Create and save new movie
-            createNewMovie(movieData)
-                .then(() => {
-                    res.redirect('/movies');
-                })
-                .catch(err => {
-                    console.error('Error saving movie:', err);
-                    next(err);
-                });
-        }
+        if (isEdit)
+            updateExistingMovie(req, res, next, movieData);
+        else
+            createNewMovie(res, next, movieData);
     };
 
 }

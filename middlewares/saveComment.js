@@ -7,100 +7,65 @@
 module.exports = (objRepo) => {
 
     /**
-     * Validates comment data
+     * Saves a comment to the database. If the item being commented on is not found, sends a 404 response.
+     * If the comment is saved successfully, redirects to the details page of the item. If any error occurs
+     * during the process, logs the error and passes it to the next middleware.
      *
-     * @param username - Username of the commenter
-     * @param text - Comment text
-     * @param itemId - ID of the item being commented on
-     * @returns {string|null} - Error message or null if valid
+     * @param res The response object.
+     * @param next The next middleware function.
+     * @param userId The ID of the user who is making the comment.
+     * @param text The text content of the comment.
+     * @param itemId The ID of the item being commented on.
      */
-    function validateCommentData(username, text, itemId) {
-        if (!username || !text || !itemId)
-            return '⚠️  All fields are required.';
+    function saveComment(res, next, userId, text, itemId) {
+        let modelType = null;
 
-        return null;
-    }
-
-
-    /**
-     * Finds an item (book or movie) by ID
-     *
-     * @param itemId - ID of the item to find
-     * @returns {Promise<{modelType: string, item: *}|null>} - Promise resolving to the item and its type, or null if not found
-     */
-    function findItem(itemId) {
-        // First try to find the item as a book
-        return objRepo.BookModel.findById(itemId)
+        objRepo.BookModel.findById(itemId)
             .then(book => {
                 if (book) {
-                    return {item: book, modelType: 'Book'};
-                } else {
-                    // Try to find the item as a movie
-                    return objRepo.MovieModel.findById(itemId)
-                        .then(movie => {
-                            if (movie)
-                                return {item: movie, modelType: 'Movie'};
-                            else
-                                return null;
-                        });
+                    modelType = 'Book';
+                    return book;
                 }
-            });
-    }
+                return objRepo.MovieModel.findById(itemId).then(movie => {
+                    if (movie) modelType = 'Movie';
+                    return movie;
+                });
+            })
+            .then(item => {
+                if (!item)
+                    return res.status(404).send('Item not found.');
 
+                const newComment = new objRepo.CommentModel({
+                    user: userId,
+                    text: text,
+                    _assignedTo: itemId,
+                    onModel: modelType
+                });
 
-    /**
-     * Saves a comment for an item
-     *
-     * @param username - Username of the commenter
-     * @param text - Comment text
-     * @param itemId - ID of the item being commented on
-     * @param modelType - Type of the model ('Book' or 'Movie')
-     * @returns {Promise<*>} - Promise resolving when the comment is saved
-     */
-    function saveComment(username, text, itemId, modelType) {
-        // Create new comment
-        const newComment = new objRepo.CommentModel({
-            username,
-            text,
-            date: new Date(),
-            _assignedTo: itemId,
-            onModel: modelType
-        });
-
-        return newComment.save()
+                return newComment.save();
+            })
             .then(savedComment => {
-                console.log('✅  Comment saved successfully');
-                return savedComment;
+                if (savedComment) {
+                    console.log('Comment saved successfully');
+                    return res.redirect('/details/' + itemId);
+                }
+            })
+            .catch(err => {
+                console.error('Error saving comment:', err);
+                return next(err);
             });
     }
 
 
     return (req, res, next) => {
-        const username = req.session.username;
+
+        const userId = req.session.userId;
         const text = req.body.text;
         const itemId = req.params.id;
 
-        // Validate comment data
-        const validationError = validateCommentData(username, text, itemId);
-        if (validationError)
-            return res.status(400).send(validationError);
+        if (!userId || !text || !itemId)
+            return res.status(400).send('All fields are required.');
 
-        // Find the item
-        findItem(itemId)
-            .then(result => {
-                if (!result)
-                    return res.status(404).send('⚠️  Item not found.');
-
-                // Save the comment
-                return saveComment(username, text, itemId, result.modelType)
-                    .then(() => {
-                        res.redirect('/details/' + itemId);
-                    });
-            })
-            .catch(err => {
-                console.error('Error saving comment:', err);
-                next(err);
-            });
+        saveComment(res, next, userId, text, itemId);
     };
-
-}
+};

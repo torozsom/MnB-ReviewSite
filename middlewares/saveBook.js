@@ -18,139 +18,88 @@ module.exports = (objRepo) => {
     function validateBookData(title, author, releaseYear, description) {
         // Validate required fields
         if (!title || !author || !releaseYear || !description)
-            return '⚠️  All fields are required.';
+            return 'All fields are required.';
 
         // Validate release year
         if (isNaN(releaseYear) || releaseYear < 1800 || releaseYear > new Date().getFullYear())
-            return '⚠️  Invalid release year.';
+            return 'Invalid release year.';
 
         return null;
     }
 
 
     /**
-     * Processes image data from the request
-     *
-     * @param req - Request object
-     * @returns {object|undefined} - Image data object or undefined
-     */
-    function processImageData(req) {
-        return req.file ? {
-            data: req.file.buffer,
-            contentType: req.file.mimetype
-        } : undefined;
-    }
-
-
-    /**
      * Updates an existing book in the database
      *
-     * @param bookId - ID of the book to update
-     * @param updateData - Data to update
-     * @returns {Promise<*>} - Promise resolving to the updated book
+     * @param req The request object
+     * @param res The response object
+     * @param next The next middleware function
+     * @param updateData The data to update the book with
      */
-    async function updateExistingBook(bookId, updateData) {
-        try {
-            const book = await objRepo.BookModel.findByIdAndUpdate(
-                bookId,
-                updateData,
-                {new: true}
-            );
-            console.log('✅  Book updated successfully:', book.title);
-            return book;
-        } catch (error) {
-            console.error('Error updating book:', error);
-        }
+    function updateExistingBook(req, res, next, updateData) {
+        objRepo.BookModel.findByIdAndUpdate(req.params.id, updateData, { new: true })
+            .then(book => {
+                if (!book)
+                    return res.status(404).send('⚠️ The book was not found.');
+                console.log('Book updated successfully:', book.title);
+                return res.redirect('/');
+            })
+            .catch(err => {
+                console.error('Error updating book:', err);
+                return next(err);
+            });
     }
 
 
     /**
      * Creates a new book in the database
      *
-     * @param bookData - Data for the new book
-     * @returns {Promise<*>} - Promise resolving to the saved book
+     * @param res The response object
+     * @param next The next middleware function
+     * @param bookData The data for the new book
      */
-    async function createNewBook(bookData) {
+    function createNewBook(res, next, bookData) {
         const newBook = new objRepo.BookModel(bookData);
-        try {
-            const savedBook = await newBook.save();
-            if (savedBook) {
-                console.log('✅  Book saved successfully:', savedBook.title);
-                return savedBook;
-            }
-        } catch (error) {
-            console.error('Error saving book:', error);
-        }
+        newBook.save()
+            .then(savedBook => {
+                console.log('Book saved successfully:', savedBook.title);
+                return res.redirect('/');
+            })
+            .catch(err => {
+                console.error('Error saving book:', err);
+                return next(err);
+            });
     }
 
 
-    return async (req, res, next) => {
-        // Check if we're adding a new book or editing an existing one
-        const isEdit = req.params.id !== undefined;
-
-        // Only process if itemType is 'book' (for both add and edit forms)
+    return (req, res, next) => {
         if (req.body.itemType !== 'book')
             return next();
 
-        // Extract data from request body
+        // Validate image file
+        if (req.fileValidationError)
+            return res.status(400).send(req.fileValidationError);
+
         const title = req.body.title;
-        const author = req.body.creator; // 'creator' is used in the form
+        const author = req.body.creator;
         const releaseYear = parseInt(req.body.year);
         const description = req.body.description;
 
-        // Validate book data
         const validationError = validateBookData(title, author, releaseYear, description);
         if (validationError)
             return res.status(400).send(validationError);
 
-        // Process image if uploaded
-        const imageData = processImageData(req);
+        const isEdit = req.params.id !== undefined;
+        const bookData = { title, author, releaseYear, description };
 
-        if (isEdit) {
-            // Create update object
-            const updateData = {
-                title,
-                author,
-                releaseYear,
-                description
-            };
+        // Upload image
+        if (req.file)
+            bookData.imageUrl = '/uploads/' + req.file.filename;
 
-            // Only update image if a new one was uploaded
-            if (imageData)
-                updateData.image = imageData;
-
-            // Update existing book
-            updateExistingBook(req.params.id, updateData)
-                .then(() => {
-                    res.redirect('/books');
-                })
-                .catch(err => {
-                    if (err.message === '⚠️  Book not found.')
-                        return res.status(404).send(err.message);
-
-                    console.error('Error updating book:', err);
-                    next(err);
-                });
-        } else {
-            // Create new book data object
-            const bookData = {
-                title,
-                author,
-                releaseYear,
-                description,
-                image: imageData
-            };
-
-            // Create and save new book
-            createNewBook(bookData)
-                .then(() => {
-                    res.redirect('/books');
-                })
-                .catch(err => {
-                    console.error('Error saving book:', err);
-                    next(err);
-                });
-        }
+        // If there was an ID we edit, otherwise we create a new book
+        if (isEdit)
+            updateExistingBook(req, res, next, bookData);
+        else
+            createNewBook(res, next, bookData);
     };
-
 }

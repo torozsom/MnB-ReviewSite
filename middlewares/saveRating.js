@@ -6,118 +6,124 @@
  */
 module.exports = (objRepo) => {
 
-    return (req, res, next) => {
-        const username = req.session.username;
+    /**
+     * Finds an item by ID and determines its model type (Book or Movie).
+     * If the item is found, returns it; otherwise, returns null.
+     *
+     * @param itemId
+     * @param modelType
+     * @returns {Promise<*>} Promise resolving to the found item or null if not found
+     */
+    function findItem(itemId, modelType) {
+        return objRepo.BookModel.findById(itemId)
+            .then(book => {
+                if (book) {
+                    modelType = 'Book';
+                    return book;
+                }
+                return objRepo.MovieModel.findById(itemId)
+                    .then(movie => {
+                        if (movie) modelType = 'Movie';
+                        return movie;
+                    });
+            })
+    }
 
-        // Extract data from request body
+
+    /**
+     * Saves a new rating or updates an existing rating for a user and item.
+     * If an existing rating is found, it updates the rating value and saves it.
+     * If no existing rating is found, it creates a new rating document and saves it to the database.
+     *
+     * @param existingRating The existing rating document, if any.
+     * @param userId The ID of the user who is making the rating.
+     * @param rating The rating value to be saved or updated.
+     * @param itemId The ID of the item being rated.
+     * @param modelType The type of the item (Book or Movie).
+     * @returns {Promise<*>} A promise that resolves to the saved or updated rating document.
+     */
+    function saveOrUpdateRating(existingRating, userId, rating, itemId, modelType) {
+        if (existingRating) {
+            existingRating.rating = rating;
+            return existingRating.save();
+        } else {
+            // If no existing rating, create a new one
+            const newRating = new objRepo.RatingModel({
+                user: userId,
+                rating: rating,
+                _assignedTo: itemId,
+                onModel: modelType
+            });
+            return newRating.save();
+        }
+    }
+
+
+    /**
+     * Calculates the average rating for an item based on all ratings
+     * and updates the item's averageRating and ratingCount fields.
+     *
+     * @param allRatings Array of rating documents for the item.
+     * @param foundItem The item object to update.
+     * @returns {Promise<*>} A promise that resolves to the updated item object.
+     */
+    function calculateAverageRating(allRatings, foundItem) {
+        const totalRating = allRatings.reduce((sum, r) => sum + r.rating, 0);
+        foundItem.averageRating = allRatings.length > 0
+            ? (totalRating / allRatings.length)
+            : 0;
+        foundItem.ratingCount = allRatings.length;
+        return foundItem.save();
+    }
+
+
+    return (req, res, next) => {
+        const userId = req.session.userId;
         const rating = parseInt(req.body.rating);
         const itemId = req.params.id;
 
-        // Validate required fields
-        if (!username || !rating || !itemId)
-            return res.status(400).send('⚠️  All fields are required.');
-
-        // Validate rating value
+        if (!userId || isNaN(rating) || !itemId)
+            return res.status(400).send('All fields are required.');
         if (rating < 1 || rating > 5)
-            return res.status(400).send('⚠️  Rating must be between 1 and 5.');
+            return res.status(400).send('Rating must be between 1 and 5.');
 
-        // First try to find the item as a book
-        objRepo.BookModel.findById(itemId)
-            .then(book => {
-                if (book) {
-                    return saveRating('Book', itemId, book);
-                } else {
-                    // Try to find the item as a movie
-                    return objRepo.MovieModel.findById(itemId)
-                        .then(movie => {
-                            if (movie)
-                                return saveRating('Movie', itemId, movie);
-                            else
-                                return res.status(404).send('⚠️ Item not found.');
-                        });
+        let modelType = null;
+        let foundItem = null;
+
+        findItem(itemId, modelType)
+            .then(item => {
+                if (!item)
+                    return res.status(404).send('Item not found.');
+                foundItem = item;
+
+                // Check if a rating from this user already exists for this item
+                return objRepo.RatingModel.findOne({
+                    _assignedTo: itemId,
+                    onModel: modelType,
+                    user: userId
+                });
+            })
+            .then(existingRating => {
+                if (!foundItem) return;
+                return saveOrUpdateRating(existingRating, userId, rating, itemId, modelType);
+            })
+            .then(savedOrUpdatedRating => {
+                if (!savedOrUpdatedRating) return;
+                return objRepo.RatingModel.find({ _assignedTo: itemId, onModel: modelType });
+            })
+            .then(allRatings => {
+                if (!allRatings) return;
+                return calculateAverageRating(allRatings, foundItem);
+            })
+            .then(savedItem => {
+                if (savedItem) {
+                    console.log('Rating processed and average updated successfully');
+                    return res.redirect('/details/' + itemId);
                 }
             })
             .catch(err => {
-                console.error('Error finding item:', err);
-                next(err);
+                console.error('Error during rating process:', err);
+                return next(err);
             });
-
-
-        /**
-         * Saves a rating for a specific item to the database. If a rating from the
-         * user already exists, it updates the existing rating; otherwise, it creates
-         * a new rating entity. After saving, it triggers an update for the item's
-         * average rating.
-         *
-         * @param {string} modelType - The type of model being rated.
-         * @param {string} itemId - The ID of the item being rated.
-         * @param {Object} item - The item to update with the rating.
-         * @returns {Promise} - Resolves when the rating is saved and the average is updated.
-         */
-        function saveRating(modelType, itemId, item) {
-            // Check if user has already rated this item
-            return objRepo.RatingModel.findOne({
-                _assignedTo: itemId,
-                onModel: modelType,
-                username: username
-            })
-                .then(existingRating => {
-                    if (existingRating) {
-                        // Update existing rating
-                        existingRating.rating = rating;
-                        existingRating.date = new Date();
-                        return existingRating.save().then(() => updateAverageRating(modelType, itemId, item));
-                    } else {
-                        // Create new rating
-                        const newRating = new objRepo.RatingModel({
-                            username,
-                            rating,
-                            date: new Date(),
-                            _assignedTo: itemId,
-                            onModel: modelType
-                        });
-
-                        return newRating.save().then(() => updateAverageRating(modelType, itemId, item));
-                    }
-                });
-        }
-
-
-        /**
-         * Updates the average rating and rating count of an item based on all ratings
-         * for that item in the database. If no ratings exist, sets the average
-         * to 0. Saves the updated item back to the database.
-         *
-         * @param {string} modelType - The type of model being rated.
-         * @param {string} itemId - The ID of the item for which the average rating will be calculated.
-         * @param {Object} item - The item to update with the average rating.
-         * @returns {Promise} - Resolves when the item's average rating is updated and saved.
-         */
-        function updateAverageRating(modelType, itemId, item) {
-            return objRepo.RatingModel.find({
-                _assignedTo: itemId,
-                onModel: modelType
-            })
-                .then(ratings => {
-                    if (ratings.length === 0) {
-                        item.averageRating = 0;
-                        item.ratingCount = 0;
-                    } else {
-                        const totalRating = ratings.reduce((sum, r) => sum + r.rating, 0);
-                        item.averageRating = totalRating / ratings.length;
-                        item.ratingCount = ratings.length;
-                    }
-                    return item.save();
-                })
-                .then(() => {
-                    console.log('✅  Rating saved successfully');
-                    res.redirect('/details/' + itemId);
-                })
-                .catch(err => {
-                    console.error('Error saving rating:', err);
-                    next(err);
-                });
-        }
     };
-
-}
+};
