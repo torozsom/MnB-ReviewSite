@@ -17,7 +17,7 @@ module.exports = (objRepo) => {
      */
     function validateLoginCredentials(username, password) {
         if (!username || !password)
-            return '⚠️  Username and password are required.';
+            return 'Username and password are required.';
 
         return null;
     }
@@ -40,7 +40,7 @@ module.exports = (objRepo) => {
             req.session.email = user.email;
             req.session.isAuthenticated = true;
 
-            console.log('✅  User logged in successfully:', user.username);
+            console.log('User logged in successfully:', user.username);
 
             req.session.save(err => {
                 if (err) return next(err);
@@ -62,12 +62,12 @@ module.exports = (objRepo) => {
         objRepo.UserModel.findOne({username})
             .then(user => {
                 if (!user)
-                    return res.status(401).send('⚠️  Invalid username or password.');
+                    return res.status(401).send('Invalid username or password.');
 
                 return bcrypt.compare(password, user.password)
                     .then(isMatch => {
                         if (!isMatch)
-                            return res.status(401).send('⚠️  Invalid username or password.');
+                            return res.status(401).send('Invalid username or password.');
                         setupUserSession(res.req, res, next, user);
                     })
             })

@@ -17,20 +17,20 @@ module.exports = (objRepo) => {
     function validateRegistrationData(username, email, password, confirmPassword) {
         // Check required fields
         if (!username || !email || !password || !confirmPassword)
-            return '⚠️  All fields are required.';
+            return 'All fields are required.';
 
         // Check password match
         if (password !== confirmPassword)
-            return '⚠️  Passwords do not match.';
+            return 'Passwords do not match.';
 
         // Validate password length
         if (password.length < 6)
-            return "⚠️  Password must be at least 6 characters long.";
+            return "Password must be at least 6 characters long.";
 
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email))
-            return '⚠️  Invalid email format.';
+            return 'Invalid email format.';
 
         return null;
     }
@@ -47,14 +47,14 @@ module.exports = (objRepo) => {
         objRepo.UserModel.findOne({$or: [{username}, {email}]})
             .then(existingUser => {
                 if (existingUser)
-                    return res.status(400).send("⚠️  Username or email already exists.");
+                    return res.status(400).send("Username or email already exists.");
                 const newUser = new objRepo.UserModel({username, email, password});
                 return newUser.save();
             })
             .then(user => {
                 if (user) {
-                    console.log('✅  User registered successfully:', user.username);
-                    req.session.successMessage = '✅ Successful registration! Now you can log in.';
+                    console.log('User registered successfully:', user.username);
+                    req.session.successMessage = 'Successful registration! Now you can log in.';
                     return res.redirect('/login');
                 }
             })

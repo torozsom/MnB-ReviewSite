@@ -66,7 +66,7 @@ module.exports = (objRepo) => {
         const username = req.session.username;
 
         if (!itemId)
-            return res.status(400).send('⚠️  Item ID is required.');
+            return res.status(400).send('Item ID is required.');
 
         // First try to find the item as a book
         objRepo.BookModel.findById(itemId)
@@ -90,7 +90,7 @@ module.exports = (objRepo) => {
                                     loadUserRating(itemId, 'Movie', username, res)
                                 ]);
                             } else {
-                                return res.status(404).send('⚠️  Item not found.');
+                                return res.status(404).send('Item not found.');
                             }
                         });
                 }

@@ -15,7 +15,7 @@ module.exports = (objRepo) => {
      */
     function validateItemId(itemId) {
         if (!itemId)
-            return '⚠️  Item ID is required.';
+            return 'Item ID is required.';
 
         return null;
     }
@@ -31,7 +31,7 @@ module.exports = (objRepo) => {
         return objRepo.BookModel.findByIdAndDelete(itemId)
             .then(deletedBook => {
                 if (deletedBook) {
-                    console.log('✅  Book deleted successfully:', deletedBook.title);
+                    console.log('Book deleted successfully:', deletedBook.title);
                     return {item: deletedBook, modelType: 'Book'};
                 }
                 return null;
@@ -49,7 +49,7 @@ module.exports = (objRepo) => {
         return objRepo.MovieModel.findByIdAndDelete(itemId)
             .then(deletedMovie => {
                 if (deletedMovie) {
-                    console.log('✅  Movie deleted successfully:', deletedMovie.title);
+                    console.log('Movie deleted successfully:', deletedMovie.title);
                     return {item: deletedMovie, modelType: 'Movie'};
                 }
                 return null;
@@ -70,7 +70,7 @@ module.exports = (objRepo) => {
             onModel: modelType
         })
             .then(result => {
-                console.log(`✅  Deleted ${result.deletedCount} comments associated with the item.`);
+                console.log(`Deleted ${result.deletedCount} comments associated with the item.`);
             })
             .catch(err => {
                 console.error('Error deleting comments:', err);
@@ -98,7 +98,7 @@ module.exports = (objRepo) => {
                             if (result)
                                 return deleteComments(itemId, result.modelType);
                             else
-                                return res.status(404).send('⚠️  Item not found.');
+                                return res.status(404).send('Item not found.');
                         });
                 }
             })
