@@ -1,6 +1,6 @@
-# 🎬📚 M&B Reviews — Movie & Book Review Web App
-
 <div align="center">
+   <h1>🎬📚 M&B Reviews — Movie & Book Review Web App</h1>
+
   <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express.js">
   <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
@@ -10,6 +10,28 @@
 <div align="center">
   <h3>The ultimate platform where film fanatics and bookworms unite!</h3>
 </div>
+
+---
+
+## 🖼️ Screenshots
+
+<p align="center">
+  <img src="assets/mainpage.png" width="700">
+</p>
+
+<p align="center">
+  <img src="assets/detailspage.png" width="700">
+</p>
+
+<p align="center">
+  <img src="assets/registerpage.png" width="700">
+</p>
+
+<p align="center">
+  <img src="assets/loginpage.png" width="700">
+</p>
+
+---
 
 ## 📋 Overview
 
@@ -41,6 +63,7 @@ enthusiasts to share their opinions and explore new content.
 | **Database**    | MongoDB with Mongoose ODM        |
 | **Auth**        | Express-session                  |
 | **File Upload** | Multer                           |
+| **Testing**     | Jest                             |
 | **Development** | Nodemon                          |
 
 ---
@@ -82,6 +105,18 @@ enthusiasts to share their opinions and explore new content.
 
 ---
 
+## 🧪 Running Tests
+
+To run the automated tests for the application:
+
+```bash
+npm test
+```
+
+This will execute the Jest test suite located in the `tests/` directory.
+
+---
+
 ## 🧭 Usage Guide
 
 ### For Visitors
@@ -109,6 +144,7 @@ MnB_ReviewSite/
 ├── models/           # Mongoose models
 ├── public/           # Static assets (CSS, images)
 ├── routing/          # Route definitions
+├── tests/            # Unit and integration tests
 ├── views/            # EJS templates
 └── index.js          # Application entry point
 ```
@@ -126,5 +162,5 @@ MnB_ReviewSite/
 ---
 
 <div align="center">
-  <p>© 2025 M&B Reviews. All rights reserved.</p>
+  <p>© 2026 M&B Reviews. All rights reserved.</p>
 </div>
