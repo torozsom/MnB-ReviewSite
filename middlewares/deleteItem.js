@@ -8,108 +8,71 @@
 module.exports = (objRepo) => {
 
     /**
-     * Validates that the item ID is provided
+     * Deletes an item (book or movie) from the database based on the provided ID.
      *
-     * @param itemId - ID of the item to delete
-     * @returns {string|null} - Error message or null if valid
+     * @param itemId The ID of the item to be deleted
+     * @returns {Promise<{item: *, modelType: string}>}
      */
-    function validateItemId(itemId) {
-        if (!itemId)
-            return 'Item ID is required.';
-
-        return null;
-    }
-
-
-    /**
-     * Deletes a book by ID
-     *
-     * @param itemId - ID of the book to delete
-     * @returns {Promise<*>} - Promise resolving to the deleted book or null if not found
-     */
-    function deleteBook(itemId) {
+    function deleteItem(itemId) {
         return objRepo.BookModel.findByIdAndDelete(itemId)
             .then(deletedBook => {
                 if (deletedBook) {
                     console.log('Book deleted successfully:', deletedBook.title);
-                    return {item: deletedBook, modelType: 'Book'};
+                    return { item: deletedBook, modelType: 'Book' };
                 }
-                return null;
+
+                return objRepo.MovieModel.findByIdAndDelete(itemId)
+                    .then(deletedMovie => {
+                        if (deletedMovie) {
+                            console.log('✅ Movie deleted successfully:', deletedMovie.title);
+                            return { item: deletedMovie, modelType: 'Movie' };
+                        }
+                        return null;
+                    });
             });
     }
 
 
     /**
-     * Deletes a movie by ID
+     * Deletes all comments and ratings associated with a specific item (book or movie) from the database.
      *
-     * @param itemId - ID of the movie to delete
-     * @returns {Promise<*>} - Promise resolving to the deleted movie or null if not found
+     * @param itemId The ID of the item to delete associated comments and ratings for
+     * @param modelType The type of the item (book or movie)
+     * @returns {Promise<void>} A Promise that resolves when the cleanup is complete
      */
-    function deleteMovie(itemId) {
-        return objRepo.MovieModel.findByIdAndDelete(itemId)
-            .then(deletedMovie => {
-                if (deletedMovie) {
-                    console.log('Movie deleted successfully:', deletedMovie.title);
-                    return {item: deletedMovie, modelType: 'Movie'};
-                }
-                return null;
-            });
-    }
+    function deleteAssociatedData(itemId, modelType) {
+        // A Mongoose query-k elindulnak, de nem várunk rájuk egyenként
+        const commentsPromise
+            = objRepo.CommentModel.deleteMany({ _assignedTo: itemId, onModel: modelType });
+        const ratingsPromise
+            = objRepo.RatingModel.deleteMany({ _assignedTo: itemId, onModel: modelType });
 
-
-    /**
-     * Deletes comments associated with an item
-     *
-     * @param itemId - ID of the item
-     * @param modelType - Type of the model ('Book' or 'Movie')
-     * @returns {Promise<*>} - Promise resolving when comments are deleted
-     */
-    function deleteComments(itemId, modelType) {
-        return objRepo.CommentModel.deleteMany({
-            _assignedTo: itemId,
-            onModel: modelType
-        })
-            .then(result => {
-                console.log(`Deleted ${result.deletedCount} comments associated with the item.`);
-            })
-            .catch(err => {
-                console.error('Error deleting comments:', err);
-            });
+        return Promise.all([commentsPromise, ratingsPromise])
+            .then(([commentResult, ratingResult]) =>
+                console.log(`Cleaned up: ${commentResult.deletedCount} comments and ${ratingResult.deletedCount} ratings.`)
+            );
     }
 
 
     return (req, res, next) => {
         const itemId = req.params.id;
 
-        // Validate item ID
-        const validationError = validateItemId(itemId);
-        if (validationError)
-            return res.status(400).send(validationError);
+        if (!itemId)
+            return res.status(400).send('Item ID is required.');
 
-        // Try to delete the item as a book first, then as a movie if not found
-        deleteBook(itemId)
+        deleteItem(itemId)
             .then(result => {
-                if (result) {
-                    return deleteComments(itemId, result.modelType);
-                } else {
-                    // Try to find and delete the item as a movie
-                    return deleteMovie(itemId)
-                        .then(result => {
-                            if (result)
-                                return deleteComments(itemId, result.modelType);
-                            else
-                                return res.status(404).send('Item not found.');
-                        });
-                }
-            })
-            .then(() => {
-                // Redirect to home page after successful deletion
-                res.redirect('/');
+                if (!result)
+                    return res.status(404).send('Item not found.');
+
+                return deleteAssociatedData(itemId, result.modelType)
+                    .then(() => {
+                        return res.redirect('/');
+                    });
             })
             .catch(err => {
-                console.error('Error deleting item:', err);
-                next(err);
+                console.error('Error during deletion process:', err);
+                return next(err);
             });
     };
-
-}
+};

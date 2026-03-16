@@ -27,7 +27,7 @@ module.exports = (model, fields) => {
             .catch(err => {
                 console.error('Error loading items:', err);
                 res.locals.items = [];
-                return next();
+                return next(err);
             });
     };
 };

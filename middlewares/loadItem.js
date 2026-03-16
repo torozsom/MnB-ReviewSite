@@ -20,7 +20,8 @@ module.exports = (objRepo) => {
             _assignedTo: itemId,
             onModel: modelType
         })
-            .sort({date: -1}) // Sort by date descending (newest first)
+            .sort({ date: -1 })
+            .populate('user', 'username')
             .then(comments => {
                 res.locals.item.comments = comments;
             })
@@ -36,12 +37,12 @@ module.exports = (objRepo) => {
      *
      * @param {string} itemId - The ID of the item (e.g., book or movie) to which the rating is assigned.
      * @param {string} modelType - The type of the model (`Book` or `Movie`) to search the rating for.
-     * @param {string|null} username - The username of the user whose rating is being retrieved.
+     * @param {string|null} userId - The ID of the user whose rating is being retrieved.
      * @param {Object} res - The response object for attaching the user's rating.
      * @returns {Promise<void>} Resolves when the operation is complete or logs an error if it fails.
      */
-    function loadUserRating(itemId, modelType, username, res) {
-        if (!username) {
+    function loadUserRating(itemId, modelType, userId, res) {
+        if (!userId) {
             res.locals.userRating = null;
             return Promise.resolve();
         }
@@ -49,7 +50,7 @@ module.exports = (objRepo) => {
         return objRepo.RatingModel.findOne({
             _assignedTo: itemId,
             onModel: modelType,
-            username: username
+            user: userId
         })
             .then(rating => {
                 res.locals.userRating = rating ? rating.rating : null;
@@ -63,44 +64,47 @@ module.exports = (objRepo) => {
 
     return (req, res, next) => {
         const itemId = req.params.id;
-        const username = req.session.username;
+        const userId = req.session?.userId;
 
         if (!itemId)
             return res.status(400).send('Item ID is required.');
 
-        // First try to find the item as a book
+        let foundItem = null;
+        let foundModelType = null;
+
         objRepo.BookModel.findById(itemId)
             .then(book => {
                 if (book) {
-                    // Item is a book
-                    res.locals.item = book;
-                    return Promise.all([
-                        loadComments(itemId, 'Book', res),
-                        loadUserRating(itemId, 'Book', username, res)
-                    ]);
-                } else {
-                    // Try to find the item as a movie
-                    return objRepo.MovieModel.findById(itemId)
-                        .then(movie => {
-                            if (movie) {
-                                // Item is a movie
-                                res.locals.item = movie;
-                                return Promise.all([
-                                    loadComments(itemId, 'Movie', res),
-                                    loadUserRating(itemId, 'Movie', username, res)
-                                ]);
-                            } else {
-                                return res.status(404).send('Item not found.');
-                            }
-                        });
+                    foundItem = book;
+                    foundModelType = 'Book';
+                    return book;
                 }
+                return objRepo.MovieModel.findById(itemId).then(movie => {
+                    if (movie) {
+                        foundItem = movie;
+                        foundModelType = 'Movie';
+                    }
+                    return movie;
+                });
+            })
+            .then(item => {
+                if (!item) return;
+
+                res.locals.item = foundItem;
+
+                return Promise.all([
+                    loadComments(itemId, foundModelType, res),
+                    loadUserRating(itemId, foundModelType, userId, res)
+                ]);
             })
             .then(() => {
+                if (!foundItem)
+                    return res.status(404).send('⚠️ Item not found.');
                 return next();
             })
             .catch(err => {
                 console.error('Error loading item:', err);
-                next(err);
+                return next(err);
             });
     };
 
