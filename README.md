@@ -148,19 +148,3 @@ MnB_ReviewSite/
 ├── views/            # EJS templates
 └── index.js          # Application entry point
 ```
-
----
-
-## 🙏 Acknowledgements
-
-- [Express.js](https://expressjs.com/) - The web framework used
-- [MongoDB](https://www.mongodb.com/) - The database platform
-- [Mongoose](https://mongoosejs.com/) - MongoDB object modeling
-- [EJS](https://ejs.co/) - Embedded JavaScript templating
-- [Multer](https://github.com/expressjs/multer) - Middleware for handling multipart/form-data
-
----
-
-<div align="center">
-  <p>© 2026 M&B Reviews. All rights reserved.</p>
-</div>
