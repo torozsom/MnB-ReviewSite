@@ -1,5 +1,5 @@
 <div align="center">
-   <h1>🎬📚 M&B Reviews — Movie & Book Review Web App</h1>
+   <h1>🎬📚 Movie & Book Review Web App</h1>
 
   <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express.js">
